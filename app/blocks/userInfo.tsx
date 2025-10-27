@@ -24,7 +24,7 @@ export default function UserInfo() {
             alignItems: 'center',
             marginBottom: 20,
             paddingTop: 20, // extra top spacing for phones
-            gap: 30
+            gap: 20,
           }}
         >
           <Image
@@ -37,7 +37,12 @@ export default function UserInfo() {
               borderRadius: 50,
             }}
           />
-          <ThemedView>
+          <ThemedView
+            style={{
+              flexDirection: 'column',
+              gap: 15,
+            }}
+          >
             <ThemedText
               style={{
                 fontWeight: '700',
@@ -46,6 +51,28 @@ export default function UserInfo() {
             >
               Ayaan Adrito
             </ThemedText>
+
+            <ThemedView
+              style={{
+                flexDirection: 'row',
+                gap: 15,
+              }}
+            >
+              <ThemedView>
+                <ThemedText>Workouts</ThemedText>
+                <ThemedText>5</ThemedText>
+              </ThemedView>
+
+              <ThemedView>
+                <ThemedText>Followers</ThemedText>
+                <ThemedText>5</ThemedText>
+              </ThemedView>
+
+              <ThemedView>
+                <ThemedText>Following</ThemedText>
+                <ThemedText>5</ThemedText>
+              </ThemedView>
+            </ThemedView>
           </ThemedView>
         </ThemedView>
 
