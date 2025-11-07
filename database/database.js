@@ -1,4 +1,5 @@
 // database.js
+import { pastWorkouts } from "@/constants/mockWorkouts";
 import * as SQLite from 'expo-sqlite';
 import { Platform } from 'react-native';
 
@@ -14,10 +15,44 @@ export const initDB = async () => {
     'CREATE TABLE IF NOT EXISTS number_table (id INTEGER PRIMARY KEY NOT NULL, value INTEGER);'
   );
 
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS workouts (
+      id TEXT PRIMARY KEY NOT NULL,
+      name TEXT NOT NULL,
+      duration TEXT NOT NULL,
+      date TEXT NOT NULL
+    );
+  `);
+
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS exercises (
+      id INTEGER PRIMARY KEY NOT NULL,
+      workout_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      FOREIGN KEY (workout_id) REFERENCES workouts (id)
+    );
+  `);
+
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS sets (
+      id INTEGER PRIMARY KEY NOT NULL,
+      exercise_id INTEGER NOT NULL,
+      setOrder INTEGER NOT NULL,
+      weight REAL NOT NULL,
+      reps INTEGER NOT NULL,
+      FOREIGN KEY (exercise_id) REFERENCES exercises (id)
+    );
+  `);
+
+  const workoutsResult = await db.getAllAsync('SELECT COUNT(*) as count FROM workouts;');
+  if (workoutsResult[0].count === 0) {
+    await insertMockWorkouts();
+  }
+
   // Check if empty and insert 3
   const result = await db.getAllAsync('SELECT COUNT(*) as count FROM number_table;');
   if (result[0].count === 0) {
-    await db.runAsync('INSERT INTO number_table (value) VALUES (3);');
+    await db.runAsync('INSERT INTO number_table (value) VALUES (69);');
   }
 };
 
@@ -25,4 +60,71 @@ export const initDB = async () => {
 export const getNumber = async () => {
   const result = await db.getAllAsync('SELECT value FROM number_table LIMIT 1;');
   return result.length > 0 ? result[0].value : null;
+};
+
+const insertMockWorkouts = async () => {
+  for (const workout of pastWorkouts) {
+    // Insert workout
+    await db.runAsync(
+      'INSERT INTO workouts (id, name, duration, date) VALUES (?, ?, ?, ?)',
+      [workout.id, workout.name, workout.duration, workout.date]
+    );
+
+    for (const exercise of workout.exercises) {
+      // Insert exercise and get the inserted ID
+      const exerciseResult = await db.runAsync(
+        'INSERT INTO exercises (workout_id, name) VALUES (?, ?)',
+        [workout.id, exercise.name]
+      );
+
+      const exerciseId = exerciseResult.lastInsertRowId;
+
+      for (const set of exercise.sets) {
+        // Insert sets
+        await db.runAsync(
+          'INSERT INTO sets (exercise_id, setOrder, weight, reps) VALUES (?, ?, ?, ?)',
+          [exerciseId, set.setOrder, set.weight, set.reps]
+        );
+      }
+    }
+  }
+};
+
+export const getWorkouts = async () => {
+  const workouts = await db.getAllAsync('SELECT * FROM workouts ORDER BY date DESC;');
+  
+  for (const workout of workouts) {
+    // Get exercises for each workout
+    const exercises = await db.getAllAsync(
+      'SELECT * FROM exercises WHERE workout_id = ?',
+      [workout.id]
+    );
+
+    workout.exercises = [];
+    
+    for (const exercise of exercises) {
+      // Get sets for each exercise
+      const sets = await db.getAllAsync(
+        'SELECT * FROM sets WHERE exercise_id = ? ORDER BY setOrder',
+        [exercise.id]
+      );
+      
+      workout.exercises.push({
+        name: exercise.name,
+        sets: sets
+      });
+    }
+  }
+  
+  return workouts;
+};
+
+export const clearTable = async () => {
+  await db.runAsync('DELETE FROM number_table;');
+};
+
+export const clearWorkouts = async () => {
+  await db.runAsync('DELETE FROM sets;');
+  await db.runAsync('DELETE FROM exercises;');
+  await db.runAsync('DELETE FROM workouts;');
 };
