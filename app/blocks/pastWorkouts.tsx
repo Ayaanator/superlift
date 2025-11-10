@@ -51,7 +51,8 @@ export default function PastWorkouts() {
       <ThemedText style={[styles.workoutDetails, { color: textColor }]}>
         {item.duration} • {item.date}
       </ThemedText>
-      <ThemedView style={{ flexDirection: 'row', gap: 20 }}>
+      <ThemedView style={{ flexDirection: 'row', gap: 20, borderRadius: 6,
+         paddingLeft: 10, paddingTop: 4, overflow: 'hidden' }}>
         {/* Volume */}
         <ThemedView style={{ alignItems: 'center' }}>
           <ThemedText style={{ fontSize: 12, color: textColor }}>Volume</ThemedText>
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   workoutItem: {
     padding: 12,
     marginVertical: 6,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   workoutName: {
     fontSize: 16,
