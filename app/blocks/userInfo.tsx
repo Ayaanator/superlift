@@ -8,7 +8,7 @@ export default function UserInfo() {
   const background = useThemeColor({}, 'background');
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: background }}>
+    <SafeAreaView style={{ backgroundColor: background }}>
       <ThemedView
         style={{
           padding: 10,

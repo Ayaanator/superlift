@@ -8,13 +8,7 @@ if (Platform.OS !== 'web') {
   db = SQLite.openDatabaseSync('simple.db');
 }
 
-// Initialize the table and insert number 3 if empty
 export const initDB = async () => {
-  // Create table
-  await db.execAsync(
-    'CREATE TABLE IF NOT EXISTS number_table (id INTEGER PRIMARY KEY NOT NULL, value INTEGER);'
-  );
-
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS workouts (
       id TEXT PRIMARY KEY NOT NULL,
@@ -48,18 +42,6 @@ export const initDB = async () => {
   if (workoutsResult[0].count === 0) {
     await insertMockWorkouts();
   }
-
-  // Check if empty and insert 3
-  const result = await db.getAllAsync('SELECT COUNT(*) as count FROM number_table;');
-  if (result[0].count === 0) {
-    await db.runAsync('INSERT INTO number_table (value) VALUES (69);');
-  }
-};
-
-// Function to get the number
-export const getNumber = async () => {
-  const result = await db.getAllAsync('SELECT value FROM number_table LIMIT 1;');
-  return result.length > 0 ? result[0].value : null;
 };
 
 const insertMockWorkouts = async () => {
@@ -101,6 +83,7 @@ export const getWorkouts = async () => {
     );
 
     workout.exercises = [];
+    workout.totalVolume = 0;
     
     for (const exercise of exercises) {
       // Get sets for each exercise
@@ -108,10 +91,14 @@ export const getWorkouts = async () => {
         'SELECT * FROM sets WHERE exercise_id = ? ORDER BY setOrder',
         [exercise.id]
       );
-      
+
+      let exerciseVolume = sets.reduce((sum, set) => sum + set.weight * set.reps, 0);
+      workout.totalVolume += exerciseVolume;
+
       workout.exercises.push({
         name: exercise.name,
-        sets: sets
+        sets: sets,
+        volume: exerciseVolume
       });
     }
   }

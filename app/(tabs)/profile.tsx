@@ -1,9 +1,8 @@
 import UserInfo from "@/app/blocks/userInfo";
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { clearWorkouts, getWorkouts, initDB } from '@/database/database';
-import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
+import PastWorkouts from "../blocks/pastWorkouts";
 
 interface WorkoutSet {
   setOrder: number;
@@ -25,47 +24,11 @@ interface Workout {
 }
 
 export default function TabTwoScreen() {
-  const [workouts, setWorkouts] = useState<any[]>([]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      await clearWorkouts();
-      await initDB();
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const data = await getWorkouts();
-      setWorkouts(data);
-    };
-    
-    loadData();
-  }, []);
-
-  const renderWorkoutItem = ({ item }) => (
-    <ThemedView style={styles.workoutItem}>
-      <ThemedText style={styles.workoutName}>{item.name}</ThemedText>
-      <ThemedText style={styles.workoutDetails}>
-        {item.duration} • {item.date}
-      </ThemedText>
-      <ThemedText style={styles.exerciseCount}>
-        {item.exercises?.length || 0} exercises
-      </ThemedText>
-    </ThemedView>
-  );
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <UserInfo />
-      <ThemedText style={styles.title}>Workouts from DB:</ThemedText>
-      
-      {workouts.length === 0 ? (
-        <ThemedText>No workouts found</ThemedText>
-      ) : (
-        <FlatList
-          data={workouts}
-          renderItem={renderWorkoutItem}
-          keyExtractor={(item) => item.id}
-          style={styles.list}
-        />
-      )}
+      <UserInfo/>
+      <PastWorkouts/>
     </ThemedView>
   );
 }
@@ -80,5 +43,31 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  workoutItem: {
+    padding: 12,
+    marginVertical: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+  workoutName: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  workoutDetails: {
+    fontSize: 14,
+    color: '#666',
+  },
+  exerciseCount: {
+    fontSize: 14,
+    color: '#888',
+  },
+  list: {
+    paddingHorizontal: 16,
   },
 });

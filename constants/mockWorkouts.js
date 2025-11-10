@@ -44,6 +44,14 @@ export const pastWorkouts = [
           { setOrder: 2, weight: 50, reps: 10 },
           { setOrder: 3, weight: 50, reps: 8 }
         ]
+      },
+      {
+        name: "Tricep Extension (Cable)",
+        sets: [
+          { setOrder: 1, weight: 40, reps: 12 },
+          { setOrder: 2, weight: 50, reps: 10 },
+          { setOrder: 3, weight: 50, reps: 8 }
+        ]
       }
     ]
   },
