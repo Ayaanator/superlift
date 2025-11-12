@@ -106,6 +106,10 @@ export const getWorkouts = async () => {
   return workouts;
 };
 
+export const getWorkout = async () => {
+  
+}
+
 export const clearTable = async () => {
   await db.runAsync('DELETE FROM number_table;');
 };

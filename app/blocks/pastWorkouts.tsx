@@ -2,8 +2,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { clearWorkouts, getWorkouts, initDB } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
 interface WorkoutSet {
   setOrder: number;
@@ -27,6 +28,7 @@ export interface Workout {
 
 export default function PastWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const router = useRouter();
 
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
@@ -43,50 +45,80 @@ export default function PastWorkouts() {
     loadData();
   }, []);
 
-  const renderWorkoutItem = ({ item }: { item: Workout }) => (
+  const renderWorkoutItem = (item: Workout) => (
+    <Pressable key={item.id} onPress={() => router.push({
+      pathname: `/workouts/details`,
+      params: { id: item.id, name: item.name },
+    })}>
+      
     <ThemedView style={[styles.workoutItem, { backgroundColor: secondaryColor }]}>
       <ThemedText style={[styles.workoutName, { color: textColor }]}>
         {item.name}
       </ThemedText>
-      <ThemedText style={[styles.workoutDetails, { color: textColor }]}>
+      <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 12 }]}>
         {item.duration} • {item.date}
       </ThemedText>
-      <ThemedView style={{ flexDirection: 'row', gap: 20, borderRadius: 6,
-         paddingLeft: 10, paddingTop: 4, overflow: 'hidden' }}>
-        {/* Volume */}
-        <ThemedView style={{ alignItems: 'center' }}>
-          <ThemedText style={{ fontSize: 12, color: textColor }}>Volume</ThemedText>
-          <ThemedText style={{ fontSize: 18, fontWeight: '700', color: textColor }}>
-            {item.totalVolume || 0}
-          </ThemedText>
+      <ThemedView style={{ flexDirection: 'column', gap: 20, borderRadius: 6,
+         paddingLeft: 10, paddingTop: 4, paddingBottom: 4, overflow: 'hidden' }}>
+        <ThemedView style={{ display: 'flex', gap: 5, overflow: 'hidden', flexDirection: 'row' }}>
+          {/* Volume */}
+          <ThemedView style={{ alignItems: 'center' }}>
+            <ThemedText style={{ fontSize: 12, color: textColor }}>Volume</ThemedText>
+            <ThemedText style={{ fontSize: 18, fontWeight: '700', color: textColor }}>
+              {item.totalVolume || 0}
+            </ThemedText>
+          </ThemedView>
+
+          {/* Exercises */}
+          <ThemedView style={{ alignItems: 'center' }}>
+            <ThemedText style={{ fontSize: 12, color: textColor }}>Exercises</ThemedText>
+            <ThemedText style={{ fontSize: 18, fontWeight: '700', color: textColor }}>
+              {item.exercises?.length || 0}
+            </ThemedText>
+          </ThemedView>
         </ThemedView>
 
-        {/* Exercises */}
-        <ThemedView style={{ alignItems: 'center' }}>
-          <ThemedText style={{ fontSize: 12, color: textColor }}>Exercises</ThemedText>
-          <ThemedText style={{ fontSize: 18, fontWeight: '700', color: textColor }}>
-            {item.exercises?.length || 0}
-          </ThemedText>
+        {/*Exercise list*/}
+        <ThemedView style={{ display: 'flex', gap: 5, overflow: 'hidden' }}>
+          {item.exercises.slice(0, 4).map((exercise, index) => (
+            <ThemedText key={index} style={{ fontSize: 18, color: textColor, 
+            marginTop: 8 }}>
+              {exercise.name}
+            </ThemedText>
+          ))}
+
+          {item.exercises?.length > 4 && (
+            <ThemedText style={{ fontSize: 12, color: textColor, opacity: 0.7, marginTop: 8 }}>
+              See {item.exercises.length - 4} more exercise{item.exercises.length - 4 === 1? '' : 's'}
+            </ThemedText>
+          )}
         </ThemedView>
       </ThemedView>
     </ThemedView>
+
+    </Pressable>
+
   );
 
   if (workouts.length === 0) {
-    return <ThemedText>No workouts found</ThemedText>;
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText>No workouts found</ThemedText>
+      </ThemedView>
+    );
   }
 
   return (
-    <FlatList
-      data={workouts}
-      renderItem={renderWorkoutItem}
-      keyExtractor={(item) => item.id}
-      style={styles.list}
-    />
+    <ThemedView style={styles.container}>
+      {workouts.map(renderWorkoutItem)}
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+  },
   workoutItem: {
     padding: 12,
     marginVertical: 6,
@@ -101,8 +133,5 @@ const styles = StyleSheet.create({
   },
   exerciseCount: {
     fontSize: 14,
-  },
-  list: {
-    paddingHorizontal: 16,
   },
 });
