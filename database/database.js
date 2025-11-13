@@ -106,8 +106,44 @@ export const getWorkouts = async () => {
   return workouts;
 };
 
-export const getWorkout = async () => {
+export const getWorkout = async (id) => {
+  const workoutResult = await db.getAllAsync(
+    'SELECT * FROM workouts WHERE id = ?', 
+    [id]
+  );
   
+  if (workoutResult.length === 0) {
+    return null;
+  }
+
+  const workout = workoutResult[0];
+
+  workout.exercises = [];
+  workout.totalVolume = 0;
+
+  const exercises = await db.getAllAsync(
+    'SELECT * FROM exercises WHERE workout_id = ?',
+    [id]
+  );
+
+  for (const exercise of exercises) {
+    // Get sets for each exercise
+    const sets = await db.getAllAsync(
+      'SELECT * FROM sets WHERE exercise_id = ? ORDER BY setOrder',
+      [exercise.id]
+    );
+
+    let exerciseVolume = sets.reduce((sum, set) => sum + set.weight * set.reps, 0);
+    workout.totalVolume += exerciseVolume;
+
+    workout.exercises.push({
+      name: exercise.name,
+      sets: sets,
+      volume: exerciseVolume
+    });
+  }
+
+  return workout;
 }
 
 export const clearTable = async () => {
