@@ -5,6 +5,8 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+
 
 interface WorkoutSet {
   setOrder: number;
@@ -44,26 +46,36 @@ export default function WorkoutDetails() {
   }, [])
 
   return (
-    <ThemedView style={{ flex: 1, padding: 20, display: 'flex' }}>
-      <ThemedText style={[styles.workoutName, { color: textColor }]}>
-        {name}
-      </ThemedText>
-      <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 12 }]}>
-        {workout?.duration} • {workout?.date}
-      </ThemedText>
-      <ThemedView style={{ height: 2, backgroundColor: secondaryColor, opacity: 0.3, marginVertical: 12 }}/>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+    <ScrollView 
+      showsVerticalScrollIndicator={false}
+    >
+      <ThemedView style={{ flex: 1, padding: 20, display: 'flex', backgroundColor: backgroundColor }}>
+        <ThemedText style={[styles.title, { color: textColor }]}>
+          {name}
+        </ThemedText>
+        <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 12 }]}>
+          {workout?.duration} • {workout?.date}
+        </ThemedText>
+        <ThemedView style={{ height: 2, backgroundColor: secondaryColor, opacity: 0.3, marginBottom: 12 }}/>
 
-      <ThemedView style={styles.exerciseContainer}>
-        {workout?.exercises.map((exercise, index) => (
-          <ThemedView key={`${exercise.name}-${index}`}>
-            <ThemedText>{exercise.name}</ThemedText>
-            {exercise?.sets.map((set, index) => (
-              <ThemedText key={`${set.setOrder}-${index}`}>{set.setOrder}: {set.weight} lbs x {set.reps} reps</ThemedText>
-            ))}
-          </ThemedView>
-        ))}
+        <ThemedView style={styles.exerciseContainer}>
+          {workout?.exercises.map((exercise, index) => (
+            <ThemedView key={`${exercise.name}-${index}`} style={styles.exerciseContainer}>
+              <ThemedText style={styles.title}>{exercise.name}</ThemedText>
+              {exercise?.sets.map((set, index) => (
+                <ThemedView key={`${set.setOrder}-${index}`} style={{display: 'flex', flexDirection: 'row'}}>
+                  <ThemedText style={[styles.subtitle, {marginRight: 5}]}>{set.setOrder} </ThemedText>
+                  <ThemedText>{set.weight} lbs x </ThemedText>
+                  <ThemedText>{set.reps} reps</ThemedText>
+                </ThemedView>
+              ))}
+            </ThemedView>
+          ))}
+        </ThemedView>
       </ThemedView>
-    </ThemedView>
+    </ScrollView>
+    </GestureHandlerRootView>
   );
 }
 
@@ -71,9 +83,24 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
   },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 17,
+    fontWeight: '600'
+  },
+  paragraph: {
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  workoutDetails: {
+    fontSize: 14,
+  },
   exerciseContainer: {
-    marginVertical: 6,
-    borderRadius: 6,
+    marginBottom: 20,
   },
   workoutName: {
     fontSize: 16,

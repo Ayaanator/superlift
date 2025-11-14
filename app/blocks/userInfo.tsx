@@ -13,6 +13,7 @@ export default function UserInfo() {
         style={{
           padding: 10,
           margin: 10,
+          marginBottom: 0,
           borderRadius: 12,
         }}
       >

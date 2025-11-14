@@ -55,14 +55,14 @@ export default function PastWorkouts() {
       <ThemedText style={[styles.workoutName, { color: textColor }]}>
         {item.name}
       </ThemedText>
-      <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 12 }]}>
+      <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 8 }]}>
         {item.duration} • {item.date}
       </ThemedText>
       <ThemedView style={{ flexDirection: 'column', gap: 20, borderRadius: 6,
-         paddingLeft: 10, paddingTop: 4, paddingBottom: 4, overflow: 'hidden' }}>
+         paddingLeft: 10, paddingTop: 4, paddingBottom: 12, overflow: 'hidden' }}>
         <ThemedView style={{ display: 'flex', gap: 5, overflow: 'hidden', flexDirection: 'row' }}>
           {/* Volume */}
-          <ThemedView style={{ alignItems: 'center' }}>
+          <ThemedView style={[{ alignItems: 'center' }, { margin: 0 }, { padding: 0 }]}>
             <ThemedText style={{ fontSize: 12, color: textColor }}>Volume</ThemedText>
             <ThemedText style={{ fontSize: 18, fontWeight: '700', color: textColor }}>
               {item.totalVolume || 0}
@@ -82,7 +82,7 @@ export default function PastWorkouts() {
         <ThemedView style={{ display: 'flex', gap: 5, overflow: 'hidden' }}>
           {item.exercises.slice(0, 4).map((exercise, index) => (
             <ThemedText key={index} style={{ fontSize: 18, color: textColor, 
-            marginTop: 8 }}>
+            marginBottom: 8 }}>
               {exercise.name}
             </ThemedText>
           ))}
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   workoutItem: {
     padding: 12,
-    marginVertical: 6,
+    marginBottom: 12,
     borderRadius: 6,
   },
   workoutName: {
