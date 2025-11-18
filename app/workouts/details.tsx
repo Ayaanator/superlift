@@ -7,7 +7,6 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 
-
 interface WorkoutSet {
   setOrder: number;
   weight: number;
@@ -46,7 +45,7 @@ export default function WorkoutDetails() {
   }, [])
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: backgroundColor }}>
     <ScrollView 
       showsVerticalScrollIndicator={false}
     >
