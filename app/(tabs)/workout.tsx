@@ -1,25 +1,32 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from '../blocks/workoutPanelContext';
 
+import { useTabBarHeight } from '../blocks/tabBarContext';
+
 export default function WorkoutScreen() {
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
   const { active, setActive, setExpanded } = useWorkoutPanel();
+  const { setTabBarHeight } = useTabBarHeight(); 
+  const tabBarHeight = useBottomTabBarHeight();
+
+  React.useEffect(() => {
+    setTabBarHeight(tabBarHeight);
+  }, [tabBarHeight, setTabBarHeight]);
   
   const toggleWorkout = () => {
     if (active) {
-      // If workout is active, close it
       setActive(false);
       setExpanded(false);
     } else {
-      // If no workout, start one
       setActive(true);
-      setExpanded(false); // Start in collapsed mode
+      setExpanded(false);
     }
   };
 

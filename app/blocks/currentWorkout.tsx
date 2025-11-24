@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 
 export default function CurrentWorkout({ preview = false, fullScreen = false }: Props) {
   const { closeWorkout, setExpanded } = useWorkoutPanel();
+  const insets = useSafeAreaInsets();
 
   const handleClose = () => {
     closeWorkout();
@@ -26,7 +28,10 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
   }
 
   return (
-    <ThemedView style={styles.fullScreenContainer}>
+    <ThemedView style={[
+      styles.fullScreenContainer,
+      { paddingBottom: insets.bottom + 20 } // Add space for home indicator
+    ]}>
       <ThemedText style={styles.fullTitle}>Current Workout</ThemedText>
       
       {/* Workout content goes here */}
@@ -38,7 +43,7 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
         {/* Actual workout exercises, sets, reps, etc. */}
       </ThemedView>
 
-      {/* Action buttons */}
+      {/* Action buttons with safe area consideration */}
       <ThemedView style={styles.actions}>
         <Pressable 
           style={[styles.button, styles.closeButton]}
@@ -48,10 +53,13 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
         </Pressable>
         
         <Pressable 
-          style={[styles.button, styles.collapseButton]}
-          onPress={() => setExpanded(false)}
+          style={[styles.button, styles.addButton]}
+          onPress={() => {
+            // Add exercise logic here
+            console.log('Add exercise pressed');
+          }}
         >
-          <ThemedText style={styles.buttonText}>Minimize</ThemedText>
+          <ThemedText style={styles.buttonText}>Add Exercise</ThemedText>
         </Pressable>
       </ThemedView>
     </ThemedView>
@@ -63,6 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     justifyContent: 'center',
+    backgroundColor: '#151718',
   },
   previewText: {
     fontSize: 18,
@@ -76,6 +85,7 @@ const styles = StyleSheet.create({
   fullScreenContainer: {
     flex: 1,
     padding: 20,
+    paddingTop: 10, // Less padding at top
   },
   fullTitle: {
     fontSize: 24,
@@ -87,33 +97,37 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 15,
     padding: 10,
+    marginBottom: 10, // Space before buttons
   },
   exerciseText: {
     fontSize: 16,
-    padding: 10,
+    padding: 12,
     backgroundColor: 'rgba(0,0,0,0.1)',
     borderRadius: 8,
   },
   actions: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 20,
+    marginTop: 'auto', // Push buttons to bottom
+    paddingBottom: 10, // Extra padding
   },
   button: {
     flex: 1,
-    padding: 15,
+    padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 50, // Ensure consistent button height
   },
   closeButton: {
     backgroundColor: '#ff4444',
   },
-  collapseButton: {
-    backgroundColor: '#666',
+  addButton: {
+    backgroundColor: '#7eb8c7',
   },
   buttonText: {
     color: 'white',
     fontWeight: '600',
+    fontSize: 16,
   },
 });

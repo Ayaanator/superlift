@@ -1,34 +1,65 @@
 import CurrentWorkout from '@/app/blocks/currentWorkout';
-import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import React, { useRef } from 'react';
+import { Animated, Dimensions, PanResponder, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabBarHeight } from './tabBarContext';
 import { useWorkoutPanel } from './workoutPanelContext';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const TAB_BAR_HEIGHT = 50; // Approximate tab bar height
 
 export default function WorkoutPanel() {
   const { expanded, setExpanded, active } = useWorkoutPanel();
+  const { tabBarHeight, setTabBarHeight } = useTabBarHeight();
+  const insets = useSafeAreaInsets();
 
-  // If no workout is active, hide the panel entirely.
+  // Hooks must be called at the top
+  const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 5,
+      onPanResponderMove: (_, gesture) => {
+        pan.setValue({ x: 0, y: gesture.dy });
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dy < -50) setExpanded(true);
+        else if (gesture.dy > 50) setExpanded(false);
+        Animated.spring(pan, { toValue: { x: 0, y: 0 }, useNativeDriver: false }).start();
+      },
+    })
+  ).current;
+
+  const REAL_HEIGHT = tabBarHeight;
+
   if (!active) return null;
 
+  // const TAB_BAR_HEIGHT = tabBarHeight;
+  // const TAB_BAR_HEIGHT = 50;
+  const TAB_BAR_HEIGHT = REAL_HEIGHT;
+  const COLLAPSED_HEIGHT = 140;
+  const EXPANDED_HEIGHT = SCREEN_HEIGHT - insets.top;
+
   return (
-    <View style={[styles.container, expanded ? styles.expanded : styles.collapsed]}>
-      {/* Only make the header area pressable for expand/collapse */}
-      <View style={styles.header}>
-        <View 
-          style={styles.dragHandle}
-          onTouchEnd={() => setExpanded(!expanded)}
-        />
-      </View>
-      
-      <View style={styles.content}>
-        <CurrentWorkout 
-          fullScreen={expanded} 
-          preview={!expanded} 
-        />
-      </View>
-    </View>
+    <Animated.View
+      style={[
+        styles.container,
+        expanded
+          ? { ...styles.expanded, height: EXPANDED_HEIGHT, top: insets.top }
+          : { ...styles.collapsed, height: COLLAPSED_HEIGHT, bottom: TAB_BAR_HEIGHT },
+        { transform: pan.getTranslateTransform() },
+      ]}
+    >
+      <Animated.View style={styles.header} {...panResponder.panHandlers}>
+        <ThemedView style={styles.dragHandle} />
+        <ThemedText>{REAL_HEIGHT}</ThemedText>
+      </Animated.View>
+
+      <ThemedView style={styles.content}>
+        <CurrentWorkout fullScreen={expanded} preview={!expanded} />
+      </ThemedView>
+    </Animated.View>
   );
 }
 
@@ -36,24 +67,17 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     width: '100%',
-    bottom: 0,
-    left: 0,
-    backgroundColor: '#222',
+    backgroundColor: '#151718',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    overflow: 'hidden',
     elevation: 25,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.5,
     shadowRadius: 3.84,
-    zIndex: 1000, // Ensure it's above tab bar
+    zIndex: 1000,
   },
   header: {
-    height: 30,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
@@ -68,14 +92,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  // collapsed mini-player height - sits above tab bar
-  collapsed: {
-    height: 80,
-    bottom: TAB_BAR_HEIGHT, // Position above tab bar
-  },
-  // expanded takes most of screen but leaves space for status bar
-  expanded: {
-    height: SCREEN_HEIGHT - 40, // Leave some space at top
-    top: 40, // Start below status bar
-  },
+  collapsed: {},
+  expanded: {},
 });
