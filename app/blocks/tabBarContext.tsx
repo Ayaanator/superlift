@@ -5,7 +5,6 @@ type TabBarHeightContextType = {
   setTabBarHeight: React.Dispatch<React.SetStateAction<number>>;
 };
 
-// Create context with default null
 const TabBarHeightContext = createContext<TabBarHeightContextType | null>(null);
 
 export function TabBarHeightProvider({ children }: { children: ReactNode }) {

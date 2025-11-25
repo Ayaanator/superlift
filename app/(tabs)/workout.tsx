@@ -5,9 +5,8 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useWorkoutPanel } from '../blocks/workoutPanelContext';
-
 import { useTabBarHeight } from '../blocks/tabBarContext';
+import { useWorkoutPanel } from '../blocks/workoutPanelContext';
 
 export default function WorkoutScreen() {
   const backgroundColor = useThemeColor({}, 'background');
@@ -43,10 +42,8 @@ export default function WorkoutScreen() {
           </ThemedText>
         </Pressable>
 
-        {/* Additional workout content can go here */}
         <ThemedView style={styles.workoutOptions}>
           <ThemedText style={styles.subtitle}>Workout Templates</ThemedText>
-          {/* Add your workout templates or other content here */}
         </ThemedView>
       </ThemedView>
     </SafeAreaView>

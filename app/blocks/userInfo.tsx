@@ -17,14 +17,13 @@ export default function UserInfo() {
           borderRadius: 12,
         }}
       >
-        {/* Image container */}
         <ThemedView
           style={{
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignItems: 'center',
             marginBottom: 20,
-            paddingTop: 20, // extra top spacing for phones
+            paddingTop: 20,
             gap: 20,
           }}
         >

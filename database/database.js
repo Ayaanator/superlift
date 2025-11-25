@@ -1,4 +1,5 @@
 // database.js
+import { exercises } from "@/constants/exercises";
 import { pastWorkouts } from "@/constants/mockWorkouts";
 import * as SQLite from 'expo-sqlite';
 import { Platform } from 'react-native';
@@ -11,7 +12,7 @@ if (Platform.OS !== 'web') {
 export const initDB = async () => {
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS workouts (
-      id TEXT PRIMARY KEY NOT NULL,
+      id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL,
       duration TEXT NOT NULL,
       date TEXT NOT NULL
@@ -38,7 +39,18 @@ export const initDB = async () => {
     );
   `);
 
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS exercise_master (
+      id INTEGER PRIMARY KEY NOT NULL,
+      name TEXT NOT NULL,
+      equipment TEXT NOT NULL,
+      primaryMuscleGroup TEXT NOT NULL,
+      secondaryMuscleGroups TEXT
+    );
+  `);
+
   const workoutsResult = await db.getAllAsync('SELECT COUNT(*) as count FROM workouts;');
+  await insertMasterExercises();
   if (workoutsResult[0].count === 0) {
     await insertMockWorkouts();
   }
@@ -54,9 +66,14 @@ const insertMockWorkouts = async () => {
 
     for (const exercise of workout.exercises) {
       // Insert exercise and get the inserted ID
+      const exerciseName = await db.getAllAsync(
+        `SELECT name from exercise_master WHERE id = ?`,
+        [exercise.id]
+      )
+
       const exerciseResult = await db.runAsync(
         'INSERT INTO exercises (workout_id, name) VALUES (?, ?)',
-        [workout.id, exercise.name]
+        [workout.id, exerciseName[0].name]
       );
 
       const exerciseId = exerciseResult.lastInsertRowId;
@@ -146,12 +163,24 @@ export const getWorkout = async (id) => {
   return workout;
 }
 
-export const clearTable = async () => {
-  await db.runAsync('DELETE FROM number_table;');
-};
-
 export const clearWorkouts = async () => {
   await db.runAsync('DELETE FROM sets;');
   await db.runAsync('DELETE FROM exercises;');
   await db.runAsync('DELETE FROM workouts;');
+};
+
+export const insertMasterExercises = async () => {
+  for (const exercise of exercises) {
+    await db.runAsync(
+      `INSERT OR REPLACE INTO exercise_master (id, name, equipment, primaryMuscleGroup, secondaryMuscleGroups)
+       VALUES (?, ?, ?, ?, ?)`,
+      [
+        exercise.id,
+        exercise.name,
+        exercise.equipment,
+        exercise.primaryMuscleGroup,
+        JSON.stringify(exercise.secondaryMuscleGroups) // store array as string
+      ]
+    );
+  }
 };

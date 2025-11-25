@@ -23,7 +23,6 @@ export default function RootLayout() {
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
 
-          {/* Workout Panel - This will overlay content but not break navigation */}
           <WorkoutPanel />
           
           <StatusBar style="auto" />

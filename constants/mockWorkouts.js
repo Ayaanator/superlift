@@ -1,4 +1,4 @@
-export const pastWorkouts = [
+/*export const pastWorkouts = [
   {
     id: "1",
     name: "Upper Body",
@@ -225,4 +225,88 @@ export const pastWorkouts = [
       }
     ]
   }
+];*/
+
+export const pastWorkouts = [
+  {
+    id: 3,
+    name: "Upper Body",
+    duration: "48min",
+    date: "Nov 12, 2024",
+    exercises: [
+      {
+        id: 2,
+        sets: [
+          { setOrder: 1, weight: 45, reps: 8 },
+          { setOrder: 2, weight: 45, reps: 10 },
+          { setOrder: 3, weight: 45, reps: 12 }
+        ]
+      },
+      {
+        id: 5,
+        sets: [
+          { setOrder: 1, weight: 95, reps: 10 },
+          { setOrder: 2, weight: 115, reps: 8 },
+          { setOrder: 3, weight: 115, reps: 8 }
+        ]
+      },
+      {
+        id: 4,
+        sets: [
+          { setOrder: 1, weight: 65, reps: 10 },
+          { setOrder: 2, weight: 75, reps: 8 },
+          { setOrder: 3, weight: 75, reps: 6 }
+        ]
+      },
+      {
+        id: 1,
+        sets: [
+          { setOrder: 1, weight: 250, reps: 10 },
+          { setOrder: 2, weight: 250, reps: 9 },
+          { setOrder: 3, weight: 300, reps: 8 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    name: "Lower Body",
+    duration: "52min",
+    date: "Nov 10, 2024",
+    exercises: [
+      {
+        id: 1,
+        sets: [
+          { setOrder: 1, weight: 135, reps: 10 },
+          { setOrder: 2, weight: 155, reps: 8 },
+          { setOrder: 3, weight: 165, reps: 6 }
+        ]
+      },
+      {
+        id: 3,
+        sets: [
+          { setOrder: 1, weight: 135, reps: 8 },
+          { setOrder: 2, weight: 185, reps: 5 },
+          { setOrder: 3, weight: 205, reps: 3 },
+          { setOrder: 4, weight: 185, reps: 5 }
+        ]
+      },
+      {
+        id: 2,
+        sets: [
+          { setOrder: 1, weight: 160, reps: 12 },
+          { setOrder: 2, weight: 180, reps: 10 },
+          { setOrder: 3, weight: 200, reps: 8 }
+        ]
+      },
+      {
+        id: 5,
+        sets: [
+          { setOrder: 1, weight: 50, reps: 12 },
+          { setOrder: 2, weight: 60, reps: 10 },
+          { setOrder: 3, weight: 60, reps: 10 }
+        ]
+      }
+    ]
+  },
 ];

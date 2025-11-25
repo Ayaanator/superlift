@@ -1,5 +1,4 @@
 import CurrentWorkout from '@/app/blocks/currentWorkout';
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import React, { useRef } from 'react';
 import { Animated, Dimensions, PanResponder, StyleSheet } from 'react-native';
@@ -13,8 +12,6 @@ export default function WorkoutPanel() {
   const { expanded, setExpanded, active } = useWorkoutPanel();
   const { tabBarHeight, setTabBarHeight } = useTabBarHeight();
   const insets = useSafeAreaInsets();
-
-  // Hooks must be called at the top
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
   const panResponder = useRef(
@@ -26,7 +23,7 @@ export default function WorkoutPanel() {
       onPanResponderRelease: (_, gesture) => {
         if (gesture.dy < -50) setExpanded(true);
         else if (gesture.dy > 50) setExpanded(false);
-        Animated.spring(pan, { toValue: { x: 0, y: 0 }, useNativeDriver: false }).start();
+        Animated.spring(pan, { toValue: { x: 0, y: 0 }, tension: 80, friction: 50, useNativeDriver: false }).start();
       },
     })
   ).current;
@@ -53,7 +50,6 @@ export default function WorkoutPanel() {
     >
       <Animated.View style={styles.header} {...panResponder.panHandlers}>
         <ThemedView style={styles.dragHandle} />
-        <ThemedText>{REAL_HEIGHT}</ThemedText>
       </Animated.View>
 
       <ThemedView style={styles.content}>

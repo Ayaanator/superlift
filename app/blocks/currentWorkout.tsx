@@ -59,7 +59,7 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
             console.log('Add exercise pressed');
           }}
         >
-          <ThemedText style={styles.buttonText}>Add Exercise</ThemedText>
+          <ThemedText style={styles.buttonText}>Add Exercises</ThemedText>
         </Pressable>
       </ThemedView>
     </ThemedView>
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   fullScreenContainer: {
     flex: 1,
     padding: 20,
-    paddingTop: 10, // Less padding at top
+    paddingTop: 10,
   },
   fullTitle: {
     fontSize: 24,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 15,
     padding: 10,
-    marginBottom: 10, // Space before buttons
+    marginBottom: 10,
   },
   exerciseText: {
     fontSize: 16,
@@ -108,8 +108,8 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 'auto', // Push buttons to bottom
-    paddingBottom: 10, // Extra padding
+    marginTop: 'auto',
+    paddingBottom: 10,
   },
   button: {
     flex: 1,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 50, // Ensure consistent button height
+    minHeight: 50,
   },
   closeButton: {
     backgroundColor: '#ff4444',
