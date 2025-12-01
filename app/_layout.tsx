@@ -1,8 +1,11 @@
 import WorkoutPanel from '@/app/blocks/workoutPanel';
+import { ThemedText } from '@/components/themed-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 import 'react-native-reanimated';
 import { TabBarHeightProvider } from './blocks/tabBarContext';
 import { WorkoutPanelProvider } from './blocks/workoutPanelContext';
@@ -13,6 +16,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
 
   return (
     <WorkoutPanelProvider>
@@ -21,13 +25,45 @@ export default function RootLayout() {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            <Stack.Screen name="exercises" options={{ presentation: 'modal', 
+              title: 'Add Exercise',
+              headerRight: () => (
+                <Pressable onPress={() => console.log('Create pressed')}>
+                  <ThemedText style={{ color: '#007AFF', fontSize: 17, marginRight: 16 }}>
+                    Create
+                  </ThemedText>
+                </Pressable>
+              ),
+              headerLeft: () => (
+                <Pressable onPress={() => router.back()}>
+                  <Link href="/" dismissTo>
+                    <ThemedText style={{ color: '#FF3B30', fontSize: 17, marginLeft: 16 }}>
+                      Cancel
+                    </ThemedText>
+                  </Link>
+                </Pressable>
+              ),
+              }} />
           </Stack>
 
           <WorkoutPanel />
-          
           <StatusBar style="auto" />
         </ThemeProvider>
       </TabBarHeightProvider>
     </WorkoutPanelProvider>
   );
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  link: {
+    marginTop: 15,
+    paddingVertical: 15,
+  },
+});

@@ -35,14 +35,13 @@ export default function PastWorkouts() {
   const textColor = useThemeColor({}, 'text');
 
   useEffect(() => {
-    const loadData = async () => {
+    (async () => {
       await clearWorkouts();
       await initDB();
       await new Promise(resolve => setTimeout(resolve, 100));
       const data = await getWorkouts();
       setWorkouts(data);
-    };
-    loadData();
+    })();
   }, []);
 
   const renderWorkoutItem = (item: Workout) => (

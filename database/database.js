@@ -184,3 +184,8 @@ export const insertMasterExercises = async () => {
     );
   }
 };
+
+export const getExercises = async () => {
+  const workouts = await db.getAllAsync('SELECT * FROM exercise_master');
+  return workouts;
+}

@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ type Props = {
 export default function CurrentWorkout({ preview = false, fullScreen = false }: Props) {
   const { closeWorkout, setExpanded } = useWorkoutPanel();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const handleClose = () => {
     closeWorkout();
@@ -55,7 +57,8 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
         <Pressable 
           style={[styles.button, styles.addButton]}
           onPress={() => {
-            // Add exercise logic here
+            //router.push('/blocks/pastWorkouts');
+            router.push('/exercises');
             console.log('Add exercise pressed');
           }}
         >
