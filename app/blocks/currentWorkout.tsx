@@ -59,7 +59,6 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
           onPress={() => {
             //router.push('/blocks/pastWorkouts');
             router.push('/exercises');
-            console.log('Add exercise pressed');
           }}
         >
           <ThemedText style={styles.buttonText}>Add Exercises</ThemedText>

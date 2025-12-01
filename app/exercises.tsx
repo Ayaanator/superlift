@@ -3,8 +3,9 @@ import { ThemedView } from '@/components/themed-view';
 import { getExercises } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Exercise = {
   id: number;
@@ -21,7 +22,10 @@ type SelectedExercise = {
 export default function ModalScreen() {
   const [masterExercises, setMasterExercises] = useState<Exercise[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise>({});
+
   const iconColor = useThemeColor({}, 'text');
+  const selectedCount = Object.values(selectedExercises).filter(Boolean).length;
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     (async () => {
@@ -36,10 +40,16 @@ export default function ModalScreen() {
       ...prev,
       [exerciseId]: !prev[exerciseId]
     }));
+
   };
 
   return (
     <ThemedView style={styles.container}>
+    <ScrollView 
+      style={{ flex: 1 }}
+      contentContainerStyle={{ paddingBottom: 20 }}
+      showsVerticalScrollIndicator={false}
+    >
       <ThemedText type="subtitle" style={{marginBottom: 30}}>Available Exercises</ThemedText>
       <ThemedView style={styles.exerciseContainer}>
         {masterExercises.map((exercise, index) => (
@@ -73,6 +83,13 @@ export default function ModalScreen() {
           </ThemedView>
         ))}
       </ThemedView>
+    </ScrollView>
+
+    <Pressable style={ selectedCount === 0? styles.hide : [styles.stickyButton, { bottom: insets.bottom }]}>
+      <ThemedText style={styles.addButtonText}>
+        Add {selectedCount} exercise{selectedCount !== 1 ? "s" : ""}
+      </ThemedText>
+    </Pressable>
     </ThemedView>
   );
 }
@@ -109,13 +126,11 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   exercisePressed: {
-    
   },
   exerciseInfo: {
     flex: 1,
   },
   avatarContainer: {
-    
   },
   avatar: {
     width: 50,
@@ -131,5 +146,28 @@ const styles = StyleSheet.create({
     elevation: 10, // For Android
     borderWidth: 2,
     borderColor: '#0D86FF',
+  },
+  stickyButton: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    backgroundColor: '#0D86FF',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#0D86FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  hide: {
+    display: 'none'
   }
 });

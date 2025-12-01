@@ -33,5 +33,40 @@ export const exercises = [
     equipment: "Barbell",
     primaryMuscleGroup: "Biceps",
     secondaryMuscleGroups: ["Forearms"]
+  },
+  {
+    id: 6,
+    name: "Leg Extension",
+    equipment: "Machine",
+    primaryMuscleGroup: "Quadriceps",
+    secondaryMuscleGroups: [""]
+  },
+  {
+    id: 7,
+    name: "Seated Leg Curl",
+    equipment: "Machine",
+    primaryMuscleGroup: "Hamstrings",
+    secondaryMuscleGroups: [""]
+  },
+  {
+    id: 8,
+    name: "Incline Dumbbell Bench Press",
+    equipment: "Dumbbells",
+    primaryMuscleGroup: "Chest",
+    secondaryMuscleGroups: ["Shoulders", "Triceps"]
+  },
+  {
+    id: 9,
+    name: "Standing Overhead Press",
+    equipment: "Dumbbells",
+    primaryMuscleGroup: "Shoulders",
+    secondaryMuscleGroups: ["Triceps"]
+  },
+  {
+    id: 10,
+    name: "Incline Bench Press (Smith Machine)",
+    equipment: "Smith Machine",
+    primaryMuscleGroup: "Chest",
+    secondaryMuscleGroups: ["Shoulders", "Triceps"]
   }
 ]
