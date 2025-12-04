@@ -3,11 +3,13 @@ import { ThemedView } from '@/components/themed-view';
 import { getExercises } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useWorkoutPanel } from './blocks/workoutPanelContext';
 
-type Exercise = {
+export type Exercise = {
   id: number;
   name: string;
   equipment: string;
@@ -22,7 +24,9 @@ type SelectedExercise = {
 export default function ModalScreen() {
   const [masterExercises, setMasterExercises] = useState<Exercise[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise>({});
+  const { setExercises } = useWorkoutPanel();
 
+  const router = useRouter();
   const iconColor = useThemeColor({}, 'text');
   const selectedCount = Object.values(selectedExercises).filter(Boolean).length;
   const insets = useSafeAreaInsets();
@@ -85,7 +89,13 @@ export default function ModalScreen() {
       </ThemedView>
     </ScrollView>
 
-    <Pressable style={ selectedCount === 0? styles.hide : [styles.stickyButton, { bottom: insets.bottom }]}>
+    <Pressable style={ selectedCount === 0 ? styles.hide : [styles.stickyButton, { bottom: insets.bottom }]}
+      onPress={() => { 
+        const chosen = masterExercises.filter(e => selectedExercises[e.id]);
+        setExercises(chosen);
+        router.back();
+      }}
+    >
       <ThemedText style={styles.addButtonText}>
         Add {selectedCount} exercise{selectedCount !== 1 ? "s" : ""}
       </ThemedText>

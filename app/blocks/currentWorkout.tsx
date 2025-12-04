@@ -12,7 +12,8 @@ type Props = {
 };
 
 export default function CurrentWorkout({ preview = false, fullScreen = false }: Props) {
-  const { closeWorkout, setExpanded } = useWorkoutPanel();
+  const { closeWorkout, setExpanded, setExercises, exercises } = useWorkoutPanel();
+
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -29,6 +30,8 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
     );
   }
 
+  // console.log(exercises);
+
   return (
     <ThemedView style={[
       styles.fullScreenContainer,
@@ -41,6 +44,9 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
         <ThemedText style={styles.exerciseText}>Exercise 1: Bench Press</ThemedText>
         <ThemedText style={styles.exerciseText}>Exercise 2: Squats</ThemedText>
         <ThemedText style={styles.exerciseText}>Exercise 3: Deadlifts</ThemedText>
+        {exercises.map((exercise, index) => (
+          <ThemedText style={styles.exerciseText} key={exercise.id}>Exercise {index + 1}: {exercise.name}</ThemedText>
+        ))}
         
         {/* Actual workout exercises, sets, reps, etc. */}
       </ThemedView>
