@@ -65,12 +65,14 @@ export default function ModalScreen() {
                 pressed && styles.exercisePressed
               ]}
             >
-              <ThemedView style={styles.avatarContainer}>
+              <ThemedView style={[
+                styles.avatarWrapper,
+                selectedExercises[exercise.id] && styles.avatarGlow
+              ]}>
                 <Image
                   source={{ uri: 'https://via.placeholder.com/50' }}
                   style={[
                     styles.avatar,
-                    selectedExercises[exercise.id] && styles.avatarGlow
                   ]}
                 />
               </ThemedView>
@@ -120,6 +122,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 25,
     width: '100%',
+    paddingHorizontal: 10,
   },
   exercise: {
     display: 'flex',
@@ -134,6 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     gap: 15,
+    overflow: 'visible'
   },
   exercisePressed: {
   },
@@ -151,11 +155,19 @@ const styles = StyleSheet.create({
   avatarGlow: {
     shadowColor: '#0D86FF',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 10, // For Android
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    elevation: 5,
     borderWidth: 2,
     borderColor: '#0D86FF',
+  },
+  avatarWrapper: {
+    width: 53,
+    height: 53,
+    borderRadius: 27,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
   },
   stickyButton: {
     position: 'absolute',
