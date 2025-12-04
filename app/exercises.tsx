@@ -92,7 +92,7 @@ export default function ModalScreen() {
     <Pressable style={ selectedCount === 0 ? styles.hide : [styles.stickyButton, { bottom: insets.bottom }]}
       onPress={() => { 
         const chosen = masterExercises.filter(e => selectedExercises[e.id]);
-        setExercises(chosen);
+        setExercises(prev => [...prev, ...chosen]);
         router.back();
       }}
     >

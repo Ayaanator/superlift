@@ -8,7 +8,7 @@ type WorkoutPanelContextType = {
   setActive: (v: boolean) => void;
   closeWorkout: () => void;
   exercises: Exercise[];
-  setExercises: (e: Exercise[]) => void;
+  setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
 };
 
 const WorkoutPanelContext = createContext<WorkoutPanelContextType | null>(null);
@@ -17,7 +17,6 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   const [active, setActive] = useState(false);
   const [exercises, setExercises] = useState<Exercise[]>([]);
-
 
   const closeWorkout = () => {
     setActive(false);

@@ -2,9 +2,10 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
+
 
 type Props = {
   preview?: boolean;
@@ -39,16 +40,17 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
     ]}>
       <ThemedText style={styles.fullTitle}>Current Workout</ThemedText>
       
-      {/* Workout content goes here */}
       <ThemedView style={styles.workoutContent}>
-        <ThemedText style={styles.exerciseText}>Exercise 1: Bench Press</ThemedText>
-        <ThemedText style={styles.exerciseText}>Exercise 2: Squats</ThemedText>
-        <ThemedText style={styles.exerciseText}>Exercise 3: Deadlifts</ThemedText>
-        {exercises.map((exercise, index) => (
-          <ThemedText style={styles.exerciseText} key={exercise.id}>Exercise {index + 1}: {exercise.name}</ThemedText>
-        ))}
+        <ScrollView 
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {exercises.map((exercise, index) => (
+            <ThemedText style={styles.exerciseText} key={exercise.id}>Exercise {index + 1}: {exercise.name}</ThemedText>
+          ))}
+        </ScrollView>
         
-        {/* Actual workout exercises, sets, reps, etc. */}
       </ThemedView>
 
       {/* Action buttons with safe area consideration */}
