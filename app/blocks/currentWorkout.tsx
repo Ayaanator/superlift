@@ -1,22 +1,28 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
-
 
 type Props = {
   preview?: boolean;
   fullScreen?: boolean;
 };
 
-export default function CurrentWorkout({ preview = false, fullScreen = false }: Props) {
+export default function CurrentWorkout({
+  preview = false,
+  fullScreen = false,
+  }: Props) {
   const { closeWorkout, setExpanded, setExercises, exercises } = useWorkoutPanel();
 
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const backgroundColor = useThemeColor({}, 'background');
+  const secondaryColor = useThemeColor({}, 'secondary');
 
   const handleClose = () => {
     closeWorkout();
@@ -25,7 +31,9 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
   if (preview) {
     return (
       <ThemedView style={styles.previewContainer}>
-        <ThemedText style={styles.previewText}>Workout in progress...</ThemedText>
+        <ThemedText style={styles.previewText}>
+          Workout in progress...
+        </ThemedText>
         <ThemedText style={styles.previewSubtext}>Tap to expand</ThemedText>
       </ThemedView>
     );
@@ -34,35 +42,100 @@ export default function CurrentWorkout({ preview = false, fullScreen = false }: 
   // console.log(exercises);
 
   return (
-    <ThemedView style={[
-      styles.fullScreenContainer,
-      { paddingBottom: insets.bottom + 20 } // Add space for home indicator
-    ]}>
+    <ThemedView
+      style={[
+        styles.fullScreenContainer,
+        { paddingBottom: insets.bottom + 20 }, // Add space for home indicator
+      ]}
+    >
       <ThemedText style={styles.fullTitle}>Current Workout</ThemedText>
-      
+
       <ThemedView style={styles.workoutContent}>
-        <ScrollView 
+        <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
         >
-          {exercises.map((exercise, index) => (
-            <ThemedText style={styles.exerciseText} key={exercise.id}>Exercise {index + 1}: {exercise.name}</ThemedText>
-          ))}
+          <ThemedView style={styles.exerciseContainer}>
+            {exercises.map((exercise, index) => (
+              <ThemedView key={exercise.id} style={[styles.exerciseContent]}>
+                {/* Top layer: icon, name, options*/}
+                <ThemedView
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  {/* Top layer left: icon, name*/}
+                  <ThemedView style={{ display: 'flex', flexDirection: 'row' }}>
+                    <Image
+                      source={{ uri: 'https://via.placeholder.com/50' }}
+                      style={[styles.avatar]}
+                    />
+                    <ThemedText style={styles.exerciseText}>
+                      {exercise.name}
+                    </ThemedText>
+                  </ThemedView>
+
+                  <MaterialIcons name="more-horiz" size={24} color="gray" />
+                </ThemedView>
+                {/* Set, Previous, LBS, REPS, Checkmark */}
+                <ThemedView style={{ display: 'flex', flexDirection: 'row' }}>
+                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '10%',
+                    alignItems: 'center', justifyContent: 'center'
+                   }}>
+                    <ThemedText>Set</ThemedText>
+                  </ThemedView>
+
+                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '30%',
+                    alignItems: 'center', justifyContent: 'center'
+                   }}>
+                    <ThemedText>Previous</ThemedText>
+                  </ThemedView>
+
+                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '30%',
+                    alignItems: 'center', justifyContent: 'center'
+                   }}>
+                    <ThemedText>LBS</ThemedText>
+                  </ThemedView>
+
+                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '20%',
+                    alignItems: 'center', justifyContent: 'center'
+                   }}>
+                    <ThemedText>Reps</ThemedText>
+                  </ThemedView>
+
+                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '10%',
+                    alignItems: 'center', justifyContent: 'center'
+                   }}>
+                    <MaterialIcons name="check-circle" size={24} color="gray"/>
+                  </ThemedView>
+
+                </ThemedView>
+                <Pressable
+                  style={[styles.slimButton, {borderRadius: 8, backgroundColor: secondaryColor}]}
+                  onPress={()=>{}}
+                >
+                  <ThemedText>+ Add Set</ThemedText>
+                </Pressable>
+              </ThemedView>
+            ))}
+          </ThemedView>
         </ScrollView>
-        
       </ThemedView>
 
       {/* Action buttons with safe area consideration */}
       <ThemedView style={styles.actions}>
-        <Pressable 
+        <Pressable
           style={[styles.button, styles.closeButton]}
           onPress={handleClose}
         >
           <ThemedText style={styles.buttonText}>Close Workout</ThemedText>
         </Pressable>
-        
-        <Pressable 
+
+        <Pressable
           style={[styles.button, styles.addButton]}
           onPress={() => {
             //router.push('/blocks/pastWorkouts');
@@ -109,10 +182,19 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  exerciseContainer: {
+    display: 'flex',
+    gap: 50,
+  },
+  exerciseContent: {
+    display: 'flex',
+    gap: 20,
+    // backgroundColor: 'rgba(0,0,0,0.1)',
+    borderRadius: 0,
+  },
   exerciseText: {
     fontSize: 16,
     padding: 12,
-    backgroundColor: 'rgba(0,0,0,0.1)',
     borderRadius: 8,
   },
   actions: {
@@ -124,10 +206,18 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 50,
+  },
+  slimButton: {
+    flex: 1,
+    padding: 2,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 10,
   },
   closeButton: {
     backgroundColor: '#ff4444',
@@ -135,9 +225,18 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: '#7eb8c7',
   },
+  addSetButton: {
+    backgroundColor: '#737f81ff',
+  },
   buttonText: {
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#ccc',
   },
 });
