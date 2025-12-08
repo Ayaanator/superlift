@@ -24,6 +24,16 @@ export default function CurrentWorkout({
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
 
+    const addSet = (exerciseId: number) => {
+      setExercises(prev =>
+        prev.map(e =>
+          e.id === exerciseId
+            ? { ...e, sets: [...(e.sets || []), { weight: 0, reps: 0 }] }
+            : e
+        )
+      );
+    };
+
   const handleClose = () => {
     closeWorkout();
   };
@@ -114,9 +124,45 @@ export default function CurrentWorkout({
                   </ThemedView>
 
                 </ThemedView>
+                {(exercise.sets || []).map((set, i) => (
+                  <ThemedView
+                    key={i}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingVertical: 6,
+                    }}
+                  >
+                    {/* SET NUMBER */}
+                    <ThemedView style={{ width: '10%', alignItems: 'center' }}>
+                      <ThemedText>{i + 1}</ThemedText>
+                    </ThemedView>
+
+                    {/* PREVIOUS (placeholder for now) */}
+                    <ThemedView style={{ width: '30%', alignItems: 'center' }}>
+                      <ThemedText>-</ThemedText>
+                    </ThemedView>
+
+                    {/* LBS */}
+                    <ThemedView style={{ width: '30%', alignItems: 'center' }}>
+                      <ThemedText>{set.weight}</ThemedText>
+                    </ThemedView>
+
+                    {/* REPS */}
+                    <ThemedView style={{ width: '20%', alignItems: 'center' }}>
+                      <ThemedText>{set.reps}</ThemedText>
+                    </ThemedView>
+
+                    {/* CHECKMARK */}
+                    <ThemedView style={{ width: '10%', alignItems: 'center' }}>
+                      <MaterialIcons name="check-circle" size={24} color="gray" />
+                    </ThemedView>
+                  </ThemedView>
+                ))}
+
                 <Pressable
                   style={[styles.slimButton, {borderRadius: 8, backgroundColor: secondaryColor}]}
-                  onPress={()=>{}}
+                  onPress={()=>{addSet(exercise.id)}}
                 >
                   <ThemedText>+ Add Set</ThemedText>
                 </Pressable>

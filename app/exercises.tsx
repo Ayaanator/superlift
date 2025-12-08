@@ -15,6 +15,7 @@ export type Exercise = {
   equipment: string;
   primaryMuscleGroup: string;
   secondaryMuscleGroups: string[];
+  sets?: { weight: number; reps: number }[];
 };
 
 type SelectedExercise = {
@@ -44,7 +45,6 @@ export default function ModalScreen() {
       ...prev,
       [exerciseId]: !prev[exerciseId]
     }));
-
   };
 
   return (
@@ -94,7 +94,10 @@ export default function ModalScreen() {
     <Pressable style={ selectedCount === 0 ? styles.hide : [styles.stickyButton, { bottom: insets.bottom }]}
       onPress={() => { 
         const chosen = masterExercises.filter(e => selectedExercises[e.id]);
-        setExercises(prev => [...prev, ...chosen]);
+        setExercises(prev => [
+          ...prev,
+          ...chosen.map(e => ({ ...e, sets: [] }))
+        ]);
         router.back();
       }}
     >
