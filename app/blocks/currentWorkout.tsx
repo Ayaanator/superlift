@@ -68,7 +68,7 @@ export default function CurrentWorkout({
         >
           <ThemedView style={styles.exerciseContainer}>
             {exercises.map((exercise, index) => (
-              <ThemedView key={exercise.id} style={[styles.exerciseContent]}>
+              <ThemedView key={`${exercise.id}=${index}`} style={[styles.exerciseContent]}>
                 {/* Top layer: icon, name, options*/}
                 <ThemedView
                   style={{
