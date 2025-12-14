@@ -15,7 +15,7 @@ export type Exercise = {
   equipment: string;
   primaryMuscleGroup: string;
   secondaryMuscleGroups: string[];
-  sets?: { weight: number; reps: number }[];
+  sets?: { weight: number; reps: number, completed: boolean }[];
 };
 
 type SelectedExercise = {

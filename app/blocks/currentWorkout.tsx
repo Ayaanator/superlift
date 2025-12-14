@@ -4,9 +4,10 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
+
 
 type Props = {
   preview?: boolean;
@@ -23,16 +24,55 @@ export default function CurrentWorkout({
   const router = useRouter();
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
+  const textColor = useThemeColor({}, 'text');
 
-    const addSet = (exerciseId: number) => {
-      setExercises(prev =>
-        prev.map(e =>
-          e.id === exerciseId
-            ? { ...e, sets: [...(e.sets || []), { weight: 0, reps: 0 }] }
-            : e
-        )
-      );
-    };
+  const addSet = (exerciseId: number) => {
+    setExercises(prev =>
+      prev.map(e =>
+        e.id === exerciseId
+          ? { ...e, sets: [...(e.sets || []), { weight: 0, reps: 0, completed: false }] }
+          : e
+      )
+    );
+  };
+
+  const toggleSetCompleted = (exerciseId: number, setIndex: number) => {
+    setExercises(prev =>
+      prev.map(e =>
+        e.id === exerciseId
+          ? {
+              ...e,
+              sets: e.sets?.map((s, i) =>
+                i === setIndex ? { ...s, completed: !s.completed } : s
+              ),
+            }
+          : e
+      )
+    );
+  };
+
+  const updateSetField = (
+    exerciseId: number,
+    setIndex: number,
+    field: 'weight' | 'reps',
+    input: string
+  ) => {
+    const value = input === '' ? 0 : Number(input);
+    setExercises(prev =>
+      prev.map(ex =>
+        ex.id === exerciseId
+          ? {
+              ...ex,
+              sets: ex.sets?.map((s, i) =>
+                i === setIndex
+                  ? { ...s, [field]: value }
+                  : s
+              ),
+            }
+          : ex
+      )
+    );
+  };
 
   const handleClose = () => {
     closeWorkout();
@@ -68,7 +108,7 @@ export default function CurrentWorkout({
         >
           <ThemedView style={styles.exerciseContainer}>
             {exercises.map((exercise, index) => (
-              <ThemedView key={`${exercise.id}=${index}`} style={[styles.exerciseContent]}>
+              <ThemedView key={exercise.id} style={[styles.exerciseContent]}>
                 {/* Top layer: icon, name, options*/}
                 <ThemedView
                   style={{
@@ -145,17 +185,35 @@ export default function CurrentWorkout({
 
                     {/* LBS */}
                     <ThemedView style={{ width: '30%', alignItems: 'center' }}>
-                      <ThemedText>{set.weight}</ThemedText>
+                      <TextInput
+                        style={[styles.input, {color: textColor}]}
+                        keyboardType='numeric'
+                        value={String(set.weight)}
+                        onChangeText={(text) =>
+                          updateSetField(exercise.id, i, 'weight', text)
+                        }
+                      >{set.weight}</TextInput>
                     </ThemedView>
 
                     {/* REPS */}
                     <ThemedView style={{ width: '20%', alignItems: 'center' }}>
-                      <ThemedText>{set.reps}</ThemedText>
+                      <TextInput
+                        style={[styles.input, {color: textColor}]}
+                        keyboardType='numeric'
+                        value={String(set.reps)}
+                        onChangeText={(text) =>
+                          updateSetField(exercise.id, i, 'reps', text)
+                        }
+                      >{set.reps}</TextInput>
                     </ThemedView>
 
                     {/* CHECKMARK */}
                     <ThemedView style={{ width: '10%', alignItems: 'center' }}>
-                      <MaterialIcons name="check-circle" size={24} color="gray" />
+                      <Pressable
+                        onPress={()=>{toggleSetCompleted(exercise.id, i); }}
+                      >
+                        <MaterialIcons name="check-circle" size={24} color={set.completed ? 'green' : 'gray'}/>
+                      </Pressable>
                     </ThemedView>
                   </ThemedView>
                 ))}
@@ -285,4 +343,12 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: '#ccc',
   },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '80%',
+    textAlign: 'center',
+    borderRadius: 5,
+    padding: 4,
+  }
 });
