@@ -231,7 +231,7 @@ export const pastWorkouts = [
   {
     id: 3,
     name: "Upper Body",
-    duration: "48min",
+    duration: 92,
     date: "Nov 12, 2024",
     exercises: [
       {
@@ -271,7 +271,7 @@ export const pastWorkouts = [
   {
     id: 2,
     name: "Lower Body",
-    duration: "52min",
+    duration: 52,
     date: "Nov 10, 2024",
     exercises: [
       {

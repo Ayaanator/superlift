@@ -14,7 +14,7 @@ export const initDB = async () => {
     CREATE TABLE IF NOT EXISTS workouts (
       id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL,
-      duration TEXT NOT NULL,
+      duration REAL NOT NULL,
       date TEXT NOT NULL
     );
   `);

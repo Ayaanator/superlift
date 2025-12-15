@@ -55,7 +55,7 @@ export default function PastWorkouts() {
         {item.name}
       </ThemedText>
       <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 8 }]}>
-        {item.duration} • {item.date}
+        {item.duration} mins • {item.date}
       </ThemedText>
       <ThemedView style={{ flexDirection: 'column', gap: 20, borderRadius: 6,
          paddingLeft: 10, paddingTop: 4, paddingBottom: 12, overflow: 'hidden' }}>

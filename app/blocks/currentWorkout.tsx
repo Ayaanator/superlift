@@ -8,7 +8,6 @@ import { Image, Pressable, ScrollView, StyleSheet, TextInput } from 'react-nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
 
-
 type Props = {
   preview?: boolean;
   fullScreen?: boolean;
@@ -72,6 +71,8 @@ export default function CurrentWorkout({
           : ex
       )
     );
+
+    // console.log('Updated exercises:', JSON.stringify(exercises, null, 2));
   };
 
   const handleClose = () => {
@@ -189,10 +190,14 @@ export default function CurrentWorkout({
                         style={[styles.input, {color: textColor}]}
                         keyboardType='numeric'
                         value={String(set.weight)}
+                        selectTextOnFocus={true}
+                        contextMenuHidden={true}
+                        caretHidden={true}
+                        showSoftInputOnFocus={true}
                         onChangeText={(text) =>
                           updateSetField(exercise.id, i, 'weight', text)
                         }
-                      >{set.weight}</TextInput>
+                      ></TextInput>
                     </ThemedView>
 
                     {/* REPS */}
@@ -201,10 +206,14 @@ export default function CurrentWorkout({
                         style={[styles.input, {color: textColor}]}
                         keyboardType='numeric'
                         value={String(set.reps)}
+                        selectTextOnFocus={true}
+                        contextMenuHidden={true}
+                        caretHidden={true}
+                        showSoftInputOnFocus={true}
                         onChangeText={(text) =>
                           updateSetField(exercise.id, i, 'reps', text)
                         }
-                      >{set.reps}</TextInput>
+                      ></TextInput>
                     </ThemedView>
 
                     {/* CHECKMARK */}
