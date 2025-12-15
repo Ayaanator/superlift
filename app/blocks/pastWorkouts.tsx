@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { clearWorkouts, getWorkouts, initDB } from '@/database/database';
+import { getWorkouts, initDB } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -36,7 +36,7 @@ export default function PastWorkouts() {
 
   useEffect(() => {
     (async () => {
-      await clearWorkouts();
+      // await clearWorkouts();
       await initDB();
       await new Promise(resolve => setTimeout(resolve, 100));
       const data = await getWorkouts();
@@ -55,7 +55,7 @@ export default function PastWorkouts() {
         {item.name}
       </ThemedText>
       <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 8 }]}>
-        {item.duration} mins • {item.date}
+        {item.duration} seconds • {item.date}
       </ThemedText>
       <ThemedView style={{ flexDirection: 'column', gap: 20, borderRadius: 6,
          paddingLeft: 10, paddingTop: 4, paddingBottom: 12, overflow: 'hidden' }}>

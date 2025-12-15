@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { addWorkout } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -119,6 +120,19 @@ export default function CurrentWorkout({
         style={[styles.button, { backgroundColor: '#7ec782ff', height: '5%', width: '100%', flex: 0,
           marginBottom: 20
          }]}
+         onPress={async () => {
+          try {
+            await addWorkout({
+              name: workoutName,
+              duration: secondsElapsed,
+              exercises,
+            });
+
+            closeWorkout();
+          } catch (error) {
+            console.error('Failed to save workout:', error);
+          }
+        }}
       >
         <ThemedText style={styles.buttonText}>Finish</ThemedText>
       </Pressable>

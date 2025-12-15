@@ -12,7 +12,7 @@ if (Platform.OS !== 'web') {
 export const initDB = async () => {
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS workouts (
-      id INTEGER PRIMARY KEY NOT NULL,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       duration REAL NOT NULL,
       date TEXT NOT NULL
@@ -22,7 +22,7 @@ export const initDB = async () => {
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS exercises (
       id INTEGER PRIMARY KEY NOT NULL,
-      workout_id TEXT NOT NULL,
+      workout_id INTEGER NOT NULL,
       name TEXT NOT NULL,
       FOREIGN KEY (workout_id) REFERENCES workouts (id)
     );
@@ -164,9 +164,13 @@ export const getWorkout = async (id) => {
 }
 
 export const clearWorkouts = async () => {
-  await db.runAsync('DELETE FROM sets;');
+  await db.execAsync(`DROP TABLE IF EXISTS sets;`);
+  await db.execAsync(`DROP TABLE IF EXISTS exercises;`);
+  await db.execAsync(`DROP TABLE IF EXISTS workouts;`);
+
+  /*await db.runAsync('DELETE FROM sets;');
   await db.runAsync('DELETE FROM exercises;');
-  await db.runAsync('DELETE FROM workouts;');
+  await db.runAsync('DELETE FROM workouts;');*/
 };
 
 export const insertMasterExercises = async () => {
@@ -191,7 +195,7 @@ export const getExercises = async () => {
 }
 
 export const addWorkout = async ({ name, duration, exercises }) => {
-  
+
   if (!db) return;
   const date = new Date().toISOString();
 
