@@ -189,3 +189,41 @@ export const getExercises = async () => {
   const workouts = await db.getAllAsync('SELECT * FROM exercise_master');
   return workouts;
 }
+
+export const addWorkout = async ({ name, duration, exercises }) => {
+  
+  if (!db) return;
+  const date = new Date().toISOString();
+
+  const workoutResult = await db.runAsync(
+    'INSERT INTO workouts (name, duration, date) VALUES (?, ?, ?)',
+    [name || 'Untitled Workout', duration, date]
+  );
+
+  const workoutId = workoutResult.lastInsertRowId;
+
+  for (const exercise of exercises) {
+    const exerciseResult = await db.runAsync(
+      'INSERT INTO exercises (workout_id, name) VALUES (?, ?)',
+      [workoutId, exercise.name]
+    );
+
+    const exerciseId = exerciseResult.lastInsertRowId;
+
+    for (let i = 0; i < (exercise.sets || []).length; i++) {
+      const set = exercise.sets[i];
+
+      await db.runAsync(
+        'INSERT INTO sets (exercise_id, setOrder, weight, reps) VALUES (?, ?, ?, ?)',
+        [
+          exerciseId,
+          i + 1,
+          set.weight,
+          set.reps,
+        ]
+      );
+    }
+  }
+
+  return workoutId;
+};

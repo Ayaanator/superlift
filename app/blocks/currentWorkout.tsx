@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
@@ -18,12 +18,28 @@ export default function CurrentWorkout({
   fullScreen = false,
   }: Props) {
   const { closeWorkout, setExpanded, setExercises, exercises } = useWorkoutPanel();
+  const [workoutName, setWorkoutName] = useState("");
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
 
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
   const textColor = useThemeColor({}, 'text');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsElapsed(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval); // cleanup on unmount
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
 
   const addSet = (exerciseId: number) => {
     setExercises(prev =>
@@ -99,8 +115,28 @@ export default function CurrentWorkout({
         { paddingBottom: insets.bottom + 20 }, // Add space for home indicator
       ]}
     >
-      <ThemedText style={styles.fullTitle}>Current Workout</ThemedText>
+      <Pressable
+        style={[styles.button, { backgroundColor: '#7ec782ff', height: '5%', width: '100%', flex: 0,
+          marginBottom: 20
+         }]}
+      >
+        <ThemedText style={styles.buttonText}>Finish</ThemedText>
+      </Pressable>
 
+      <TextInput
+        style={[styles.nameInput, {color: textColor}]}
+        value={String(workoutName)}
+        /*selectTextOnFocus={true}
+        contextMenuHidden={true}
+        caretHidden={true}
+        showSoftInputOnFocus={true}*/
+        onChangeText={(text) =>
+          setWorkoutName(text)
+        }
+      ></TextInput>
+
+      <ThemedText style={styles.subTitle}>{formatTime(secondsElapsed)}</ThemedText>
+      
       <ThemedView style={styles.workoutContent}>
         <ScrollView
           style={{ flex: 1 }}
@@ -242,14 +278,14 @@ export default function CurrentWorkout({
       {/* Action buttons with safe area consideration */}
       <ThemedView style={styles.actions}>
         <Pressable
-          style={[styles.button, styles.closeButton]}
+          style={[styles.button, { backgroundColor: '#ff4444' }]}
           onPress={handleClose}
         >
           <ThemedText style={styles.buttonText}>Close Workout</ThemedText>
         </Pressable>
 
         <Pressable
-          style={[styles.button, styles.addButton]}
+          style={[styles.button, { backgroundColor: '#7eb8c7'}]}
           onPress={() => {
             //router.push('/blocks/pastWorkouts');
             router.push('/exercises');
@@ -286,6 +322,12 @@ const styles = StyleSheet.create({
   fullTitle: {
     fontSize: 24,
     fontWeight: '700',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  subTitle: {
+    fontSize: 22,
+    fontWeight: '600',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -332,12 +374,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 10,
   },
-  closeButton: {
-    backgroundColor: '#ff4444',
-  },
-  addButton: {
-    backgroundColor: '#7eb8c7',
-  },
   addSetButton: {
     backgroundColor: '#737f81ff',
   },
@@ -359,5 +395,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     borderRadius: 5,
     padding: 4,
+  },
+  nameInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    textAlign: 'center',
+    borderRadius: 15,
+    height: '8%',
+    padding: 4,
+    fontSize: 24,
+    marginBottom: 20
   }
 });
