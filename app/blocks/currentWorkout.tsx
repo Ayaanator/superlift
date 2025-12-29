@@ -18,7 +18,7 @@ export default function CurrentWorkout({
   preview = false,
   fullScreen = false,
   }: Props) {
-  const { closeWorkout, setExpanded, setExercises, exercises } = useWorkoutPanel();
+  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded } = useWorkoutPanel();
   const [workoutName, setWorkoutName] = useState("");
   const [secondsElapsed, setSecondsElapsed] = useState(0);
 
@@ -129,6 +129,7 @@ export default function CurrentWorkout({
             });
 
             closeWorkout();
+            setWorkoutAdded(prev => !prev);
           } catch (error) {
             console.error('Failed to save workout:', error);
           }

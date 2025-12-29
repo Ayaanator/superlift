@@ -6,6 +6,13 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 
+
+
+
+
+
+
+import { useWorkoutPanel } from './workoutPanelContext';
 interface WorkoutSet {
   setOrder: number;
   weight: number;
@@ -28,6 +35,7 @@ export interface Workout {
 
 export default function PastWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded } = useWorkoutPanel();
   const router = useRouter();
 
   const backgroundColor = useThemeColor({}, 'background');
@@ -42,7 +50,7 @@ export default function PastWorkouts() {
       const data = await getWorkouts();
       setWorkouts(data);
     })();
-  }, []);
+  }, [workoutAdded]);
 
   const renderWorkoutItem = (item: Workout) => (
     <Pressable key={item.id} onPress={() => router.push({

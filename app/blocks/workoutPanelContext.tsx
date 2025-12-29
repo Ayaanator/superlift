@@ -9,6 +9,8 @@ type WorkoutPanelContextType = {
   closeWorkout: () => void;
   exercises: Exercise[];
   setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+  workoutAdded: boolean;
+  setWorkoutAdded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const WorkoutPanelContext = createContext<WorkoutPanelContextType | null>(null);
@@ -17,6 +19,7 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   const [active, setActive] = useState(false);
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [workoutAdded, setWorkoutAdded] = useState(false);
 
   const closeWorkout = () => {
     setActive(false);
@@ -31,7 +34,9 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
       setActive,
       closeWorkout,
       exercises,
-      setExercises
+      setExercises,
+      workoutAdded,
+      setWorkoutAdded
     }}>
       {children}
     </WorkoutPanelContext.Provider>
