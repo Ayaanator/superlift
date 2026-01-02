@@ -4,7 +4,7 @@ import { addWorkout } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
@@ -21,12 +21,16 @@ export default function CurrentWorkout({
   const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded } = useWorkoutPanel();
   const [workoutName, setWorkoutName] = useState("");
   const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const [currHeight, setCurrHeight] = useState(-1);
 
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
   const textColor = useThemeColor({}, 'text');
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const inputRefs = useRef<Record<string, TextInput | null>>({});
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -92,6 +96,26 @@ export default function CurrentWorkout({
     // console.log('Updated exercises:', JSON.stringify(exercises, null, 2));
   };
 
+  const handleInputFocus = (key: string) => {
+    const input = inputRefs.current[key];
+    const scrollView = scrollViewRef.current;
+
+    if (!input || !scrollView) return;
+
+    input.measure((x, y, width, height, pageX, pageY) => {
+      setCurrHeight(pageY); 
+      console.log(pageY);
+
+      if(pageY > 500) {
+        const scrollToY = pageY - 60;
+        scrollView.scrollTo({
+          y: scrollToY,
+          animated: true,
+        });
+      }
+    });
+  };
+
   const handleClose = () => {
     closeWorkout();
   };
@@ -154,8 +178,9 @@ export default function CurrentWorkout({
       
       <ThemedView style={styles.workoutContent}>
         <ScrollView
+          ref={scrollViewRef} 
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 300 }}
           showsVerticalScrollIndicator={false}
         >
           <ThemedView style={styles.exerciseContainer}>
@@ -248,6 +273,12 @@ export default function CurrentWorkout({
                         onChangeText={(text) =>
                           updateSetField(exercise.id, i, 'weight', text)
                         }
+                        ref={(ref) => {
+                          inputRefs.current[`${exercise.id}-${i}-weight`] = ref;
+                        }}
+                        onFocus={() =>
+                          handleInputFocus(`${exercise.id}-${i}-weight`)
+                        }
                       ></TextInput>
                     </ThemedView>
 
@@ -263,6 +294,12 @@ export default function CurrentWorkout({
                         showSoftInputOnFocus={true}
                         onChangeText={(text) =>
                           updateSetField(exercise.id, i, 'reps', text)
+                        }
+                        ref={(ref) => {
+                          inputRefs.current[`${exercise.id}-${i}-reps`] = ref;
+                        }}
+                        onFocus={() =>
+                          handleInputFocus(`${exercise.id}-${i}-reps`)
                         }
                       ></TextInput>
                     </ThemedView>
