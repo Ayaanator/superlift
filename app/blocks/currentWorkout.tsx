@@ -5,7 +5,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
 
@@ -31,6 +31,7 @@ export default function CurrentWorkout({
 
   const scrollViewRef = useRef<ScrollView>(null);
   const inputRefs = useRef<Record<string, TextInput | null>>({});
+  const scrollOffset = useRef(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -96,6 +97,7 @@ export default function CurrentWorkout({
     // console.log('Updated exercises:', JSON.stringify(exercises, null, 2));
   };
 
+  // handleInputFocus does NOTHING for now. I might use it later if KeyboardAvoidingView proves to be annoying
   const handleInputFocus = (key: string) => {
     const input = inputRefs.current[key];
     const scrollView = scrollViewRef.current;
@@ -106,13 +108,13 @@ export default function CurrentWorkout({
       setCurrHeight(pageY); 
       console.log(pageY);
 
-      if(pageY > 500) {
+      /*if(pageY > 500) {
         const scrollToY = pageY - 60;
         scrollView.scrollTo({
           y: scrollToY,
           animated: true,
         });
-      }
+      }*/
     });
   };
 
@@ -176,157 +178,161 @@ export default function CurrentWorkout({
 
       <ThemedText style={styles.subTitle}>{formatTime(secondsElapsed)}</ThemedText>
       
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={140}
+      >
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
+      >
       <ThemedView style={styles.workoutContent}>
-        <ScrollView
-          ref={scrollViewRef} 
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 300 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <ThemedView style={styles.exerciseContainer}>
-            {exercises.map((exercise, index) => (
-              <ThemedView key={exercise.id} style={[styles.exerciseContent]}>
-                {/* Top layer: icon, name, options*/}
+        <ThemedView style={styles.exerciseContainer}>
+          {exercises.map((exercise, index) => (
+            <ThemedView key={exercise.id} style={[styles.exerciseContent]}>
+              {/* Top layer: icon, name, options*/}
+              <ThemedView
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                {/* Top layer left: icon, name*/}
+                <ThemedView style={{ display: 'flex', flexDirection: 'row' }}>
+                  <Image
+                    source={{ uri: 'https://via.placeholder.com/50' }}
+                    style={[styles.avatar]}
+                  />
+                  <ThemedText style={styles.exerciseText}>
+                    {exercise.name}
+                  </ThemedText>
+                </ThemedView>
+
+                <MaterialIcons name="more-horiz" size={24} color="gray" />
+              </ThemedView>
+              {/* Set, Previous, LBS, REPS, Checkmark */}
+              <ThemedView style={{ display: 'flex', flexDirection: 'row' }}>
+                <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '10%',
+                  alignItems: 'center', justifyContent: 'center'
+                  }}>
+                  <ThemedText>Set</ThemedText>
+                </ThemedView>
+
+                <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '30%',
+                  alignItems: 'center', justifyContent: 'center'
+                  }}>
+                  <ThemedText>Previous</ThemedText>
+                </ThemedView>
+
+                <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '30%',
+                  alignItems: 'center', justifyContent: 'center'
+                  }}>
+                  <ThemedText>LBS</ThemedText>
+                </ThemedView>
+
+                <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '20%',
+                  alignItems: 'center', justifyContent: 'center'
+                  }}>
+                  <ThemedText>Reps</ThemedText>
+                </ThemedView>
+
+                <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '10%',
+                  alignItems: 'center', justifyContent: 'center'
+                  }}>
+                  <MaterialIcons name="check-circle" size={24} color="gray"/>
+                </ThemedView>
+
+              </ThemedView>
+              {(exercise.sets || []).map((set, i) => (
                 <ThemedView
+                  key={i}
                   style={{
-                    display: 'flex',
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
+                    paddingVertical: 6,
                   }}
                 >
-                  {/* Top layer left: icon, name*/}
-                  <ThemedView style={{ display: 'flex', flexDirection: 'row' }}>
-                    <Image
-                      source={{ uri: 'https://via.placeholder.com/50' }}
-                      style={[styles.avatar]}
-                    />
-                    <ThemedText style={styles.exerciseText}>
-                      {exercise.name}
-                    </ThemedText>
+                  {/* SET NUMBER */}
+                  <ThemedView style={{ width: '10%', alignItems: 'center' }}>
+                    <ThemedText>{i + 1}</ThemedText>
                   </ThemedView>
 
-                  <MaterialIcons name="more-horiz" size={24} color="gray" />
+                  {/* PREVIOUS (placeholder for now) */}
+                  <ThemedView style={{ width: '30%', alignItems: 'center' }}>
+                    <ThemedText>-</ThemedText>
+                  </ThemedView>
+
+                  {/* LBS */}
+                  <ThemedView style={{ width: '30%', alignItems: 'center' }}>
+                    <TextInput
+                      style={[styles.input, {color: textColor}]}
+                      keyboardType='numeric'
+                      value={String(set.weight)}
+                      selectTextOnFocus={true}
+                      contextMenuHidden={true}
+                      caretHidden={true}
+                      showSoftInputOnFocus={true}
+                      onChangeText={(text) =>
+                        updateSetField(exercise.id, i, 'weight', text)
+                      }
+                      ref={(ref) => {
+                        inputRefs.current[`${exercise.id}-${i}-weight`] = ref;
+                      }}
+                      onFocus={() =>
+                        handleInputFocus(`${exercise.id}-${i}-weight`)
+                      }
+                    ></TextInput>
+                  </ThemedView>
+
+                  {/* REPS */}
+                  <ThemedView style={{ width: '20%', alignItems: 'center' }}>
+                    <TextInput
+                      style={[styles.input, {color: textColor}]}
+                      keyboardType='numeric'
+                      value={String(set.reps)}
+                      selectTextOnFocus={true}
+                      contextMenuHidden={true}
+                      caretHidden={true}
+                      showSoftInputOnFocus={true}
+                      onChangeText={(text) =>
+                        updateSetField(exercise.id, i, 'reps', text)
+                      }
+                      ref={(ref) => {
+                        inputRefs.current[`${exercise.id}-${i}-reps`] = ref;
+                      }}
+                      onFocus={() =>
+                        handleInputFocus(`${exercise.id}-${i}-reps`)
+                      }
+                    ></TextInput>
+                  </ThemedView>
+
+                  {/* CHECKMARK */}
+                  <ThemedView style={{ width: '10%', alignItems: 'center' }}>
+                    <Pressable
+                      onPress={()=>{toggleSetCompleted(exercise.id, i); }}
+                    >
+                      <MaterialIcons name="check-circle" size={24} color={set.completed ? 'green' : 'gray'}/>
+                    </Pressable>
+                  </ThemedView>
                 </ThemedView>
-                {/* Set, Previous, LBS, REPS, Checkmark */}
-                <ThemedView style={{ display: 'flex', flexDirection: 'row' }}>
-                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '10%',
-                    alignItems: 'center', justifyContent: 'center'
-                   }}>
-                    <ThemedText>Set</ThemedText>
-                  </ThemedView>
+              ))}
 
-                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '30%',
-                    alignItems: 'center', justifyContent: 'center'
-                   }}>
-                    <ThemedText>Previous</ThemedText>
-                  </ThemedView>
-
-                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '30%',
-                    alignItems: 'center', justifyContent: 'center'
-                   }}>
-                    <ThemedText>LBS</ThemedText>
-                  </ThemedView>
-
-                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '20%',
-                    alignItems: 'center', justifyContent: 'center'
-                   }}>
-                    <ThemedText>Reps</ThemedText>
-                  </ThemedView>
-
-                  <ThemedView style={{ display: 'flex', flexDirection: 'row', width: '10%',
-                    alignItems: 'center', justifyContent: 'center'
-                   }}>
-                    <MaterialIcons name="check-circle" size={24} color="gray"/>
-                  </ThemedView>
-
-                </ThemedView>
-                {(exercise.sets || []).map((set, i) => (
-                  <ThemedView
-                    key={i}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingVertical: 6,
-                    }}
-                  >
-                    {/* SET NUMBER */}
-                    <ThemedView style={{ width: '10%', alignItems: 'center' }}>
-                      <ThemedText>{i + 1}</ThemedText>
-                    </ThemedView>
-
-                    {/* PREVIOUS (placeholder for now) */}
-                    <ThemedView style={{ width: '30%', alignItems: 'center' }}>
-                      <ThemedText>-</ThemedText>
-                    </ThemedView>
-
-                    {/* LBS */}
-                    <ThemedView style={{ width: '30%', alignItems: 'center' }}>
-                      <TextInput
-                        style={[styles.input, {color: textColor}]}
-                        keyboardType='numeric'
-                        value={String(set.weight)}
-                        selectTextOnFocus={true}
-                        contextMenuHidden={true}
-                        caretHidden={true}
-                        showSoftInputOnFocus={true}
-                        onChangeText={(text) =>
-                          updateSetField(exercise.id, i, 'weight', text)
-                        }
-                        ref={(ref) => {
-                          inputRefs.current[`${exercise.id}-${i}-weight`] = ref;
-                        }}
-                        onFocus={() =>
-                          handleInputFocus(`${exercise.id}-${i}-weight`)
-                        }
-                      ></TextInput>
-                    </ThemedView>
-
-                    {/* REPS */}
-                    <ThemedView style={{ width: '20%', alignItems: 'center' }}>
-                      <TextInput
-                        style={[styles.input, {color: textColor}]}
-                        keyboardType='numeric'
-                        value={String(set.reps)}
-                        selectTextOnFocus={true}
-                        contextMenuHidden={true}
-                        caretHidden={true}
-                        showSoftInputOnFocus={true}
-                        onChangeText={(text) =>
-                          updateSetField(exercise.id, i, 'reps', text)
-                        }
-                        ref={(ref) => {
-                          inputRefs.current[`${exercise.id}-${i}-reps`] = ref;
-                        }}
-                        onFocus={() =>
-                          handleInputFocus(`${exercise.id}-${i}-reps`)
-                        }
-                      ></TextInput>
-                    </ThemedView>
-
-                    {/* CHECKMARK */}
-                    <ThemedView style={{ width: '10%', alignItems: 'center' }}>
-                      <Pressable
-                        onPress={()=>{toggleSetCompleted(exercise.id, i); }}
-                      >
-                        <MaterialIcons name="check-circle" size={24} color={set.completed ? 'green' : 'gray'}/>
-                      </Pressable>
-                    </ThemedView>
-                  </ThemedView>
-                ))}
-
-                <Pressable
-                  style={[styles.slimButton, {borderRadius: 8, backgroundColor: secondaryColor}]}
-                  onPress={()=>{addSet(exercise.id)}}
-                >
-                  <ThemedText>+ Add Set</ThemedText>
-                </Pressable>
-              </ThemedView>
-            ))}
-          </ThemedView>
-        </ScrollView>
+              <Pressable
+                style={[styles.slimButton, {borderRadius: 8, backgroundColor: secondaryColor}]}
+                onPress={()=>{addSet(exercise.id)}}
+              >
+                <ThemedText>+ Add Set</ThemedText>
+              </Pressable>
+            </ThemedView>
+          ))}
+        </ThemedView>
       </ThemedView>
-
+      </ScrollView>
+      </KeyboardAvoidingView>
       {/* Action buttons with safe area consideration */}
       <ThemedView style={styles.actions}>
         <Pressable
