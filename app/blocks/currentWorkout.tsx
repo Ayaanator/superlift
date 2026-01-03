@@ -4,7 +4,7 @@ import { addWorkout } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
@@ -120,6 +120,8 @@ export default function CurrentWorkout({
 
   const handleClose = () => {
     closeWorkout();
+    setExercises([]);
+    setExpanded(false);
   };
 
   if (preview) {
@@ -154,7 +156,7 @@ export default function CurrentWorkout({
               exercises,
             });
 
-            closeWorkout();
+            handleClose();
             setWorkoutAdded(prev => !prev);
           } catch (error) {
             console.error('Failed to save workout:', error);
