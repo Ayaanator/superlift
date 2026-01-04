@@ -10,7 +10,7 @@ import { useTabBarHeight } from '../blocks/tabBarContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { setTabBarHeight } = useTabBarHeight(); 
+  const { setTabBarHeight } = useTabBarHeight();
 
   return (
     <ThemedView
