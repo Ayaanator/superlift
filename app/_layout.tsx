@@ -5,12 +5,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Link, Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Alert, Pressable, StyleSheet } from 'react-native';
 import 'react-native-reanimated';
 import { useDeleteWorkoutTest } from './blocks/pastWorkouts';
 import { TabBarHeightProvider } from './blocks/tabBarContext';
 import { WorkoutPanelProvider } from './blocks/workoutPanelContext';
+import { initDB } from '@/database/database';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -19,13 +20,52 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const deleteWorkout = useDeleteWorkoutTest();
 
-  const handleDelete = () => {
-    
-    deleteWorkout();
-    router.back();
-  }
+  useEffect(() => {
+    initDB();
+  }, []);
+
+  const WorkoutDetailsHeader = () => {
+    const deleteWorkout = useDeleteWorkoutTest();
+    const router = useRouter();
+
+    const handleDelete = () => {
+      deleteWorkout();
+      router.back();
+    };
+
+    return (
+      <Pressable
+        onPress={() =>
+          Alert.alert(
+            'Options',
+            '',
+            [
+              { text: 'Edit', onPress: () => {} },
+              { 
+                text: 'Delete', 
+                style: 'destructive',
+                onPress: () => {
+                  Alert.alert(
+                    'Delete Workout',
+                    'Are you sure you want to delete this workout? This action cannot be undone.',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Delete', style: 'destructive', onPress: handleDelete },
+                    ]
+                  );
+                } 
+              },
+              { text: 'Cancel', style: 'cancel' },
+            ]
+          )
+        }
+        style={{ marginRight: 16 }}
+      >
+        <Ionicons name="ellipsis-vertical" size={22} color="#007AFF" />
+      </Pressable>
+    );
+  };
 
   return (
     <WorkoutPanelProvider>
@@ -55,37 +95,7 @@ export default function RootLayout() {
               }} />
             <Stack.Screen name="workouts/details" options={{ presentation: 'modal', 
               title: 'Workout Details',
-              headerRight: () => (
-                <Pressable
-                  onPress={() =>
-                    Alert.alert(
-                      'Options',
-                      '',
-                      [
-                        { text: 'Edit', onPress: () => {} },
-                        { 
-                          text: 'Delete', 
-                          style: 'destructive',
-                          onPress: () => {
-                            Alert.alert(
-                              'Delete Workout',
-                              'Are you sure you want to delete this workout? This action cannot be undone.',
-                              [
-                                { text: 'Cancel', style: 'cancel' },
-                                { text: 'Delete', style: 'destructive', onPress: handleDelete },
-                              ]
-                            );
-                          } 
-                        },
-                        { text: 'Cancel', style: 'cancel' },
-                      ]
-                    )
-                  }
-                  style={{ marginRight: 16 }}
-                >
-                  <Ionicons name="ellipsis-vertical" size={22} color="#007AFF" />
-                </Pressable>
-              ),
+              headerRight: () => <WorkoutDetailsHeader />,
               headerLeft: () => (
                 <Pressable onPress={() => router.back()}>
                   <Link href="/" dismissTo>

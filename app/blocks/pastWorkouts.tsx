@@ -1,12 +1,11 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { getWorkouts, initDB } from '@/database/database';
+import { deleteWorkout, getWorkouts } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { useWorkoutPanel } from './workoutPanelContext';
-
 interface WorkoutSet {
   setOrder: number;
   weight: number;
@@ -28,16 +27,20 @@ export interface Workout {
 }
 
 export const useDeleteWorkoutTest = () => {
-  const { viewedWorkoutId } = useWorkoutPanel();
+  const { viewedWorkoutId, setWorkoutAdded } = useWorkoutPanel();
 
-  return () => {
-    console.log('DELETE TESTING: ', viewedWorkoutId);
+  return async () => {
+    if (viewedWorkoutId == null) return;
+
+    console.log('DELETE TESTING:', viewedWorkoutId);
+    await deleteWorkout(viewedWorkoutId);
+    setWorkoutAdded(prev => !prev);
   };
 };
 
 export default function PastWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const {  workoutAdded, setViewedWorkoutId, viewedWorkoutId } = useWorkoutPanel();
+  const { workoutAdded, setViewedWorkoutId, viewedWorkoutId } = useWorkoutPanel();
   const router = useRouter();
 
   const backgroundColor = useThemeColor({}, 'background');
@@ -47,11 +50,13 @@ export default function PastWorkouts() {
   useEffect(() => {
     (async () => {
       // await clearWorkouts();
-      await initDB();
+      // await initDB();
       await new Promise(resolve => setTimeout(resolve, 100));
+      // await clearWorkouts();
       const data = await getWorkouts();
       setWorkouts(data);
     })();
+      // !!! I AM USING workoutAdded as a check for when workouts are BOTH deleted and added
   }, [workoutAdded]);
 
   const renderWorkoutItem = (item: Workout) => (

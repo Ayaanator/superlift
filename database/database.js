@@ -24,7 +24,7 @@ export const initDB = async () => {
       id INTEGER PRIMARY KEY NOT NULL,
       workout_id INTEGER NOT NULL,
       name TEXT NOT NULL,
-      FOREIGN KEY (workout_id) REFERENCES workouts (id) ON DELETE CASCADE
+      FOREIGN KEY (workout_id) REFERENCES workouts (id)
     );
   `);
 
@@ -35,7 +35,7 @@ export const initDB = async () => {
       setOrder INTEGER NOT NULL,
       weight REAL NOT NULL,
       reps INTEGER NOT NULL,
-      FOREIGN KEY (exercise_id) REFERENCES exercises (id) ON DELETE CASCADE
+      FOREIGN KEY (exercise_id) REFERENCES exercises (id)
     );
   `);
 
@@ -52,7 +52,7 @@ export const initDB = async () => {
   const workoutsResult = await db.getAllAsync('SELECT COUNT(*) as count FROM workouts;');
   await insertMasterExercises();
   if (workoutsResult[0].count === 0) {
-    await insertMockWorkouts();
+    //await insertMockWorkouts();
   }
 };
 
@@ -164,13 +164,13 @@ export const getWorkout = async (id) => {
 }
 
 export const clearWorkouts = async () => {
-  await db.execAsync(`DROP TABLE IF EXISTS sets;`);
+  /*await db.execAsync(`DROP TABLE IF EXISTS sets;`);
   await db.execAsync(`DROP TABLE IF EXISTS exercises;`);
-  await db.execAsync(`DROP TABLE IF EXISTS workouts;`);
+  await db.execAsync(`DROP TABLE IF EXISTS workouts;`);*/
 
-  /*await db.runAsync('DELETE FROM sets;');
+  await db.runAsync('DELETE FROM sets;');
   await db.runAsync('DELETE FROM exercises;');
-  await db.runAsync('DELETE FROM workouts;');*/
+  await db.runAsync('DELETE FROM workouts;');
 };
 
 export const insertMasterExercises = async () => {
@@ -233,5 +233,18 @@ export const addWorkout = async ({ name, duration, exercises }) => {
 };
 
 export const deleteWorkout = async (id) => {
-  await db.runAsync('DELETE FROM workouts WHERE id = ?', [id])
-}
+  if (!db) return;
+
+  const exercises = await db.getAllAsync(
+    'SELECT id FROM exercises WHERE workout_id = ?',
+    [id]
+  );
+
+  for (const exercise of exercises) {
+    await db.runAsync('DELETE FROM sets WHERE exercise_id = ?', [exercise.id]);
+  }
+
+  await db.runAsync('DELETE FROM exercises WHERE workout_id = ?', [id]);
+
+  await db.runAsync('DELETE FROM workouts WHERE id = ?', [id]);
+};
