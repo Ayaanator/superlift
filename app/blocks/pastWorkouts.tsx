@@ -5,14 +5,8 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-
-
-
-
-
-
-
 import { useWorkoutPanel } from './workoutPanelContext';
+
 interface WorkoutSet {
   setOrder: number;
   weight: number;
@@ -33,9 +27,17 @@ export interface Workout {
   exercises: Exercise[];
 }
 
+export const useDeleteWorkoutTest = () => {
+  const { viewedWorkoutId } = useWorkoutPanel();
+
+  return () => {
+    console.log('DELETE TESTING: ', viewedWorkoutId);
+  };
+};
+
 export default function PastWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded } = useWorkoutPanel();
+  const {  workoutAdded, setViewedWorkoutId, viewedWorkoutId } = useWorkoutPanel();
   const router = useRouter();
 
   const backgroundColor = useThemeColor({}, 'background');
@@ -53,10 +55,13 @@ export default function PastWorkouts() {
   }, [workoutAdded]);
 
   const renderWorkoutItem = (item: Workout) => (
-    <Pressable key={item.id} onPress={() => router.push({
-      pathname: `/workouts/details`,
-      params: { id: item.id, name: item.name },
-    })}>
+    <Pressable key={item.id} onPress={() => {
+      router.push({
+        pathname: `/workouts/details`,
+        params: { id: item.id, name: item.name },
+      });
+      setViewedWorkoutId(Number(item.id));
+    }}>
       
     <ThemedView style={[styles.workoutItem, { backgroundColor: secondaryColor }]}>
       <ThemedText style={[styles.workoutName, { color: textColor }]}>

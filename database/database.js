@@ -24,7 +24,7 @@ export const initDB = async () => {
       id INTEGER PRIMARY KEY NOT NULL,
       workout_id INTEGER NOT NULL,
       name TEXT NOT NULL,
-      FOREIGN KEY (workout_id) REFERENCES workouts (id)
+      FOREIGN KEY (workout_id) REFERENCES workouts (id) ON DELETE CASCADE
     );
   `);
 
@@ -35,7 +35,7 @@ export const initDB = async () => {
       setOrder INTEGER NOT NULL,
       weight REAL NOT NULL,
       reps INTEGER NOT NULL,
-      FOREIGN KEY (exercise_id) REFERENCES exercises (id)
+      FOREIGN KEY (exercise_id) REFERENCES exercises (id) ON DELETE CASCADE
     );
   `);
 
@@ -231,3 +231,7 @@ export const addWorkout = async ({ name, duration, exercises }) => {
 
   return workoutId;
 };
+
+export const deleteWorkout = async (id) => {
+  await db.runAsync('DELETE FROM workouts WHERE id = ?', [id])
+}
