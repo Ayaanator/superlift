@@ -25,7 +25,7 @@ type SelectedExercise = {
 export default function ModalScreen() {
   const [masterExercises, setMasterExercises] = useState<Exercise[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise>({});
-  const { setExercises } = useWorkoutPanel();
+  const { setExercises, replacingExerciseId, setReplacingExerciseId } = useWorkoutPanel();
 
   const router = useRouter();
   const iconColor = useThemeColor({}, 'text');
@@ -94,15 +94,22 @@ export default function ModalScreen() {
     <Pressable style={ selectedCount === 0 ? styles.hide : [styles.stickyButton, { bottom: insets.bottom }]}
       onPress={() => { 
         const chosen = masterExercises.filter(e => selectedExercises[e.id]);
-        setExercises(prev => [
-          ...prev,
-          ...chosen.map(e => ({ ...e, sets: [] }))
-        ]);
+        if (replacingExerciseId !== null) {
+          if (chosen.length === 1) {
+            setExercises(prev => prev.map(e => e.id === replacingExerciseId ? { ...chosen[0], sets: e.sets || [] } : e));
+          }
+          setReplacingExerciseId(null);
+        } else {
+          setExercises(prev => [
+            ...prev,
+            ...chosen.map(e => ({ ...e, sets: [] }))
+          ]);
+        }
         router.back();
       }}
     >
       <ThemedText style={styles.addButtonText}>
-        Add {selectedCount} exercise{selectedCount !== 1 ? "s" : ""}
+        {replacingExerciseId !== null ? 'Replace' : 'Add'} {selectedCount} exercise{selectedCount !== 1 ? "s" : ""}
       </ThemedText>
     </Pressable>
     </ThemedView>

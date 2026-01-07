@@ -5,7 +5,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
 
@@ -18,7 +18,7 @@ export default function CurrentWorkout({
   preview = false,
   fullScreen = false,
   }: Props) {
-  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded } = useWorkoutPanel();
+  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded, setReplacingExerciseId } = useWorkoutPanel();
   const [workoutName, setWorkoutName] = useState("");
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [currHeight, setCurrHeight] = useState(-1);
@@ -214,7 +214,21 @@ export default function CurrentWorkout({
                   </ThemedText>
                 </ThemedView>
 
-                <MaterialIcons name="more-horiz" size={24} color="gray" />
+                <Pressable
+                  onPress={() => {
+                    Alert.alert(
+                      'Exercise Options',
+                      'Choose an action',
+                      [
+                        { text: 'Remove', onPress: () => setExercises(prev => prev.filter(e => e.id !== exercise.id)) },
+                        { text: 'Replace', onPress: () => { setReplacingExerciseId(exercise.id); router.push('/exercises'); } },
+                        { text: 'Cancel', style: 'cancel' }
+                      ]
+                    );
+                  }}
+                >
+                  <MaterialIcons name="more-horiz" size={24} color="gray" />
+                </Pressable>
               </ThemedView>
               {/* Set, Previous, LBS, REPS, Checkmark */}
               <ThemedView style={{ display: 'flex', flexDirection: 'row' }}>
