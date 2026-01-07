@@ -5,7 +5,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './blocks/workoutPanelContext';
 
@@ -25,7 +25,7 @@ type SelectedExercise = {
 export default function ModalScreen() {
   const [masterExercises, setMasterExercises] = useState<Exercise[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise>({});
-  const { setExercises, replacingExerciseId, setReplacingExerciseId } = useWorkoutPanel();
+  const { setExercises, exercises, replacingExerciseId, setReplacingExerciseId } = useWorkoutPanel();
 
   const router = useRouter();
   const iconColor = useThemeColor({}, 'text');
@@ -96,13 +96,18 @@ export default function ModalScreen() {
         const chosen = masterExercises.filter(e => selectedExercises[e.id]);
         if (replacingExerciseId !== null) {
           if (chosen.length === 1) {
-            setExercises(prev => prev.map(e => e.id === replacingExerciseId ? { ...chosen[0], sets: e.sets || [] } : e));
+            setExercises(prev => prev.map(e => e.id === replacingExerciseId ? { ...chosen[0], sets: [{ weight: 0, reps: 0, completed: false }] } : e));
           }
           setReplacingExerciseId(null);
         } else {
+          const duplicates = chosen.filter(e => exercises.some(ex => ex.id === e.id));
+          if (duplicates.length > 0) {
+            Alert.alert('Duplicate Exercise', 'Some selected exercises are already in the workout.');
+            return;
+          }
           setExercises(prev => [
             ...prev,
-            ...chosen.map(e => ({ ...e, sets: [] }))
+            ...chosen.map(e => ({ ...e, sets: [{ weight: 0, reps: 0, completed: false }] }))
           ]);
         }
         router.back();
