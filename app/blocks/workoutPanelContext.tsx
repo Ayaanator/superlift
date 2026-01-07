@@ -11,10 +11,12 @@ type WorkoutPanelContextType = {
   setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
   workoutAdded: boolean;
   setWorkoutAdded: React.Dispatch<React.SetStateAction<boolean>>;
-  viewedWorkout: boolean;
-  setViewedWorkout: React.Dispatch<React.SetStateAction<boolean>>;
+  deletedWorkout: boolean;
+  setDeletedWorkout: React.Dispatch<React.SetStateAction<boolean>>;
   viewedWorkoutId: number;
   setViewedWorkoutId: React.Dispatch<React.SetStateAction<number>>;
+  editWorkout: boolean;
+  setEditWorkout: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const WorkoutPanelContext = createContext<WorkoutPanelContextType | null>(null);
@@ -25,6 +27,7 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [workoutAdded, setWorkoutAdded] = useState(false);
   const [deletedWorkout, setDeletedWorkout] = useState(false);
+  const [editWorkout, setEditWorkout] = useState(false);
   const [viewedWorkoutId, setViewedWorkoutId] = useState(-1);
 
   const closeWorkout = () => {
@@ -43,10 +46,12 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
       setExercises,
       workoutAdded,
       setWorkoutAdded,
-      viewedWorkout: deletedWorkout,
-      setViewedWorkout: setDeletedWorkout,
+      deletedWorkout,
+      setDeletedWorkout,
       setViewedWorkoutId,
-      viewedWorkoutId
+      viewedWorkoutId,
+      editWorkout,
+      setEditWorkout,
     }}>
       {children}
     </WorkoutPanelContext.Provider>

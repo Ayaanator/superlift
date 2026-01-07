@@ -38,6 +38,15 @@ export const useDeleteWorkoutTest = () => {
   };
 };
 
+export const useEnableEditing = () => {
+  const { viewedWorkoutId, setWorkoutAdded, editWorkout, setEditWorkout } = useWorkoutPanel();
+
+  return async () => {
+    console.log('EDIT TESTING:', viewedWorkoutId);
+    setEditWorkout(true);
+  };
+};
+
 export default function PastWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const { workoutAdded, setViewedWorkoutId, viewedWorkoutId } = useWorkoutPanel();

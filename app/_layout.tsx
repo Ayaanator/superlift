@@ -1,5 +1,6 @@
 import WorkoutPanel from '@/app/blocks/workoutPanel';
 import { ThemedText } from '@/components/themed-text';
+import { initDB } from '@/database/database';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
@@ -8,10 +9,9 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { Alert, Pressable, StyleSheet } from 'react-native';
 import 'react-native-reanimated';
-import { useDeleteWorkoutTest } from './blocks/pastWorkouts';
+import { useDeleteWorkoutTest, useEnableEditing } from './blocks/pastWorkouts';
 import { TabBarHeightProvider } from './blocks/tabBarContext';
 import { WorkoutPanelProvider } from './blocks/workoutPanelContext';
-import { initDB } from '@/database/database';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -27,12 +27,20 @@ export default function RootLayout() {
 
   const WorkoutDetailsHeader = () => {
     const deleteWorkout = useDeleteWorkoutTest();
+    const enableEdit = useEnableEditing();
     const router = useRouter();
 
     const handleDelete = () => {
       deleteWorkout();
       router.back();
     };
+
+    const handleEdit = () => {
+      router.push({
+        pathname: `/workouts/editMode`,
+      });
+      enableEdit();
+    }
 
     return (
       <Pressable
@@ -41,7 +49,7 @@ export default function RootLayout() {
             'Options',
             '',
             [
-              { text: 'Edit', onPress: () => {} },
+              { text: 'Edit', onPress: handleEdit },
               { 
                 text: 'Delete', 
                 style: 'destructive',
@@ -60,7 +68,7 @@ export default function RootLayout() {
             ]
           )
         }
-        style={{ marginRight: 16 }}
+        style={{ marginRight: 0, paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'center', alignItems: 'center'}}
       >
         <Ionicons name="ellipsis-vertical" size={22} color="#007AFF" />
       </Pressable>
@@ -95,14 +103,12 @@ export default function RootLayout() {
               }} />
             <Stack.Screen name="workouts/details" options={{ presentation: 'modal', 
               title: 'Workout Details',
-              headerRight: () => <WorkoutDetailsHeader />,
+              headerRight: () => <WorkoutDetailsHeader/>,
               headerLeft: () => (
                 <Pressable onPress={() => router.back()}>
-                  <Link href="/" dismissTo>
-                    <ThemedText style={{ color: '#FF3B30', fontSize: 17, marginLeft: 16 }}>
-                      Back
-                    </ThemedText>
-                  </Link>
+                  <ThemedText style={[{ color: '#FF3B30', fontSize: 17 }, styles.text]}>
+                    Back
+                  </ThemedText>
                 </Pressable>
               ),
             }}/>
