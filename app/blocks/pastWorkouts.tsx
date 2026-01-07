@@ -40,10 +40,16 @@ export const useDeleteWorkoutTest = () => {
 
 export const useEnableEditing = () => {
   const { viewedWorkoutId, setWorkoutAdded, editWorkout, setEditWorkout } = useWorkoutPanel();
-
+  const router = useRouter();
+  
   return async () => {
     console.log('EDIT TESTING:', viewedWorkoutId);
     setEditWorkout(true);
+
+    router.push({
+      pathname: `/workouts/editMode`,
+      params: { id: viewedWorkoutId }
+    });
   };
 };
 

@@ -36,9 +36,6 @@ export default function RootLayout() {
     };
 
     const handleEdit = () => {
-      router.push({
-        pathname: `/workouts/editMode`,
-      });
       enableEdit();
     }
 
