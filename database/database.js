@@ -232,6 +232,52 @@ export const addWorkout = async ({ name, duration, exercises }) => {
   return workoutId;
 };
 
+export const updateWorkout = async (id, { name, duration, exercises }) => {
+  if (!db) return;
+
+  // Update the workout record
+  await db.runAsync(
+    'UPDATE workouts SET name = ?, duration = ? WHERE id = ?',
+    [name || 'Untitled Workout', duration, id]
+  );
+
+  // Delete existing exercises and sets for this workout
+  const existingExercises = await db.getAllAsync(
+    'SELECT id FROM exercises WHERE workout_id = ?',
+    [id]
+  );
+
+  for (const exercise of existingExercises) {
+    await db.runAsync('DELETE FROM sets WHERE exercise_id = ?', [exercise.id]);
+  }
+
+  await db.runAsync('DELETE FROM exercises WHERE workout_id = ?', [id]);
+
+  // Re-insert exercises and sets
+  for (const exercise of exercises) {
+    const exerciseResult = await db.runAsync(
+      'INSERT INTO exercises (workout_id, name) VALUES (?, ?)',
+      [id, exercise.name]
+    );
+
+    const exerciseId = exerciseResult.lastInsertRowId;
+
+    for (let i = 0; i < (exercise.sets || []).length; i++) {
+      const set = exercise.sets[i];
+
+      await db.runAsync(
+        'INSERT INTO sets (exercise_id, setOrder, weight, reps) VALUES (?, ?, ?, ?)',
+        [
+          exerciseId,
+          i + 1,
+          set.weight,
+          set.reps,
+        ]
+      );
+    }
+  }
+};
+
 export const deleteWorkout = async (id) => {
   if (!db) return;
 

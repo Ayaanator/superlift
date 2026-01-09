@@ -4,14 +4,67 @@ import { addWorkout } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { Alert, Animated, Image, KeyboardAvoidingView, PanResponder, Platform, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWorkoutPanel } from './workoutPanelContext';
 
 type Props = {
   preview?: boolean;
   fullScreen?: boolean;
+};
+
+type SwipeableSetProps = {
+  children: ReactNode;
+  onDelete: () => void;
+  exerciseId: number;
+  setIndex: number;
+};
+
+const SwipeableSet = ({ children, onDelete, exerciseId, setIndex }: SwipeableSetProps) => {
+  const translateX = useRef(new Animated.Value(0)).current;
+  const SWIPE_THRESHOLD = 20;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gesture) => {
+        return Math.abs(gesture.dx) > 10 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.2;
+      },
+      onPanResponderMove: (_, gesture) => {
+        translateX.setValue(gesture.dx);
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (Math.abs(gesture.dx) > SWIPE_THRESHOLD) {
+          Animated.timing(translateX, {
+            toValue: gesture.dx > 0 ? 1000 : -1000,
+            duration: 200,
+            useNativeDriver: true,
+          }).start(() => {
+            onDelete();
+          });
+        } else {
+          Animated.spring(translateX, {
+            toValue: 0,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  return (
+    <Animated.View
+      style={{
+        transform: [{ translateX }],
+      }}
+      {...panResponder.panHandlers}
+    >
+      {children}
+    </Animated.View>
+  );
 };
 
 export default function CurrentWorkout({
@@ -38,7 +91,7 @@ export default function CurrentWorkout({
       setSecondsElapsed(prev => prev + 1);
     }, 1000);
 
-    return () => clearInterval(interval); // cleanup on unmount
+    return () => clearInterval(interval);
   }, []);
 
   const formatTime = (seconds: number) => {
@@ -66,6 +119,19 @@ export default function CurrentWorkout({
               sets: e.sets?.map((s, i) =>
                 i === setIndex ? { ...s, completed: !s.completed } : s
               ),
+            }
+          : e
+      )
+    );
+  };
+
+  const deleteSet = (exerciseId: number, setIndex: number) => {
+    setExercises(prev =>
+      prev.map(e =>
+        e.id === exerciseId
+          ? {
+              ...e,
+              sets: e.sets?.filter((_, i) => i !== setIndex),
             }
           : e
       )
@@ -264,77 +330,83 @@ export default function CurrentWorkout({
 
               </ThemedView>
               {(exercise.sets || []).map((set, i) => (
-                <ThemedView
+                <SwipeableSet
                   key={i}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingVertical: 6,
-                  }}
+                  exerciseId={exercise.id}
+                  setIndex={i}
+                  onDelete={() => deleteSet(exercise.id, i)}
                 >
-                  {/* SET NUMBER */}
-                  <ThemedView style={{ width: '10%', alignItems: 'center' }}>
-                    <ThemedText>{i + 1}</ThemedText>
-                  </ThemedView>
+                  <ThemedView
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingVertical: 6,
+                    }}
+                  >
+                    {/* SET NUMBER */}
+                    <ThemedView style={{ width: '10%', alignItems: 'center' }}>
+                      <ThemedText>{i + 1}</ThemedText>
+                    </ThemedView>
 
-                  {/* PREVIOUS (placeholder for now) */}
-                  <ThemedView style={{ width: '30%', alignItems: 'center' }}>
-                    <ThemedText>-</ThemedText>
-                  </ThemedView>
+                    {/* PREVIOUS (placeholder for now) */}
+                    <ThemedView style={{ width: '30%', alignItems: 'center' }}>
+                      <ThemedText>-</ThemedText>
+                    </ThemedView>
 
-                  {/* LBS */}
-                  <ThemedView style={{ width: '30%', alignItems: 'center' }}>
-                    <TextInput
-                      style={[styles.input, {color: textColor}]}
-                      keyboardType='numeric'
-                      value={String(set.weight)}
-                      selectTextOnFocus={true}
-                      contextMenuHidden={true}
-                      caretHidden={true}
-                      showSoftInputOnFocus={true}
-                      onChangeText={(text) =>
-                        updateSetField(exercise.id, i, 'weight', text)
-                      }
-                      ref={(ref) => {
-                        inputRefs.current[`${exercise.id}-${i}-weight`] = ref;
-                      }}
-                      onFocus={() =>
-                        handleInputFocus(`${exercise.id}-${i}-weight`)
-                      }
-                    ></TextInput>
-                  </ThemedView>
+                    {/* LBS */}
+                    <ThemedView style={{ width: '30%', alignItems: 'center' }}>
+                      <TextInput
+                        style={[styles.input, {color: textColor}]}
+                        keyboardType='numeric'
+                        value={String(set.weight)}
+                        selectTextOnFocus={true}
+                        contextMenuHidden={true}
+                        caretHidden={true}
+                        showSoftInputOnFocus={true}
+                        onChangeText={(text) =>
+                          updateSetField(exercise.id, i, 'weight', text)
+                        }
+                        ref={(ref) => {
+                          inputRefs.current[`${exercise.id}-${i}-weight`] = ref;
+                        }}
+                        onFocus={() =>
+                          handleInputFocus(`${exercise.id}-${i}-weight`)
+                        }
+                      ></TextInput>
+                    </ThemedView>
 
-                  {/* REPS */}
-                  <ThemedView style={{ width: '20%', alignItems: 'center' }}>
-                    <TextInput
-                      style={[styles.input, {color: textColor}]}
-                      keyboardType='numeric'
-                      value={String(set.reps)}
-                      selectTextOnFocus={true}
-                      contextMenuHidden={true}
-                      caretHidden={true}
-                      showSoftInputOnFocus={true}
-                      onChangeText={(text) =>
-                        updateSetField(exercise.id, i, 'reps', text)
-                      }
-                      ref={(ref) => {
-                        inputRefs.current[`${exercise.id}-${i}-reps`] = ref;
-                      }}
-                      onFocus={() =>
-                        handleInputFocus(`${exercise.id}-${i}-reps`)
-                      }
-                    ></TextInput>
-                  </ThemedView>
+                    {/* REPS */}
+                    <ThemedView style={{ width: '20%', alignItems: 'center' }}>
+                      <TextInput
+                        style={[styles.input, {color: textColor}]}
+                        keyboardType='numeric'
+                        value={String(set.reps)}
+                        selectTextOnFocus={true}
+                        contextMenuHidden={true}
+                        caretHidden={true}
+                        showSoftInputOnFocus={true}
+                        onChangeText={(text) =>
+                          updateSetField(exercise.id, i, 'reps', text)
+                        }
+                        ref={(ref) => {
+                          inputRefs.current[`${exercise.id}-${i}-reps`] = ref;
+                        }}
+                        onFocus={() =>
+                          handleInputFocus(`${exercise.id}-${i}-reps`)
+                        }
+                      ></TextInput>
+                    </ThemedView>
 
-                  {/* CHECKMARK */}
-                  <ThemedView style={{ width: '10%', alignItems: 'center' }}>
-                    <Pressable
-                      onPress={()=>{toggleSetCompleted(exercise.id, i); }}
-                    >
-                      <MaterialIcons name="check-circle" size={24} color={set.completed ? 'green' : 'gray'}/>
-                    </Pressable>
+                    {/* CHECKMARK */}
+                    <ThemedView style={{ width: '10%', alignItems: 'center' }}>
+                      <Pressable
+                        onPress={()=>{toggleSetCompleted(exercise.id, i); }}
+                      >
+                        <MaterialIcons name="check-circle" size={24} color={set.completed ? 'green' : 'gray'}/>
+                      </Pressable>
+                    </ThemedView>
                   </ThemedView>
-                </ThemedView>
+                </SwipeableSet>
               ))}
 
               <Pressable
