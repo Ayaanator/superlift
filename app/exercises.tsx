@@ -15,7 +15,7 @@ export type Exercise = {
   equipment: string;
   primaryMuscleGroup: string;
   secondaryMuscleGroups: string[];
-  sets?: { weight: number; reps: number, completed: boolean }[];
+  sets?: { id: number; weight: number; reps: number, completed: boolean }[];
 };
 
 type SelectedExercise = {
@@ -96,7 +96,7 @@ export default function ModalScreen() {
         const chosen = masterExercises.filter(e => selectedExercises[e.id]);
         if (replacingExerciseId !== null) {
           if (chosen.length === 1) {
-            setExercises(prev => prev.map(e => e.id === replacingExerciseId ? { ...chosen[0], sets: [{ weight: 0, reps: 0, completed: false }] } : e));
+            setExercises(prev => prev.map(e => e.id === replacingExerciseId ? { ...chosen[0], sets: [{ id: Date.now(), weight: 0, reps: 0, completed: false }] } : e));
           }
           setReplacingExerciseId(null);
         } else {
@@ -107,7 +107,7 @@ export default function ModalScreen() {
           }
           setExercises(prev => [
             ...prev,
-            ...chosen.map(e => ({ ...e, sets: [{ weight: 0, reps: 0, completed: false }] }))
+            ...chosen.map(e => ({ ...e, sets: [{ id: Date.now(), weight: 0, reps: 0, completed: false }] }))
           ]);
         }
         router.back();

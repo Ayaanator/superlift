@@ -18,16 +18,16 @@ type SwipeableSetProps = {
   children: ReactNode;
   onDelete: () => void;
   exerciseId: number;
-  setIndex: number;
+  setId: number;
 };
 
-const SwipeableSet = ({ children, onDelete, exerciseId, setIndex }: SwipeableSetProps) => {
+const SwipeableSet = ({ children, onDelete, exerciseId, setId }: SwipeableSetProps) => {
   const translateX = useRef(new Animated.Value(0)).current;
   const SWIPE_THRESHOLD = 20;
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gesture) => {
         return Math.abs(gesture.dx) > 10 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.2;
       },
@@ -104,20 +104,20 @@ export default function CurrentWorkout({
     setExercises(prev =>
       prev.map(e =>
         e.id === exerciseId
-          ? { ...e, sets: [...(e.sets || []), { weight: 0, reps: 0, completed: false }] }
+          ? { ...e, sets: [...(e.sets || []), { id: Date.now(), weight: 0, reps: 0, completed: false }] }
           : e
       )
     );
   };
 
-  const toggleSetCompleted = (exerciseId: number, setIndex: number) => {
+  const toggleSetCompleted = (exerciseId: number, setId: number) => {
     setExercises(prev =>
       prev.map(e =>
         e.id === exerciseId
           ? {
               ...e,
-              sets: e.sets?.map((s, i) =>
-                i === setIndex ? { ...s, completed: !s.completed } : s
+              sets: e.sets?.map((s) =>
+                s.id === setId ? { ...s, completed: !s.completed } : s
               ),
             }
           : e
@@ -125,22 +125,25 @@ export default function CurrentWorkout({
     );
   };
 
-  const deleteSet = (exerciseId: number, setIndex: number) => {
+  const deleteSet = (exerciseId: number, setId: number) => {
     setExercises(prev =>
       prev.map(e =>
         e.id === exerciseId
           ? {
               ...e,
-              sets: e.sets?.filter((_, i) => i !== setIndex),
+              sets: e.sets?.filter((s) => s.id !== setId),
             }
           : e
       )
     );
+    // Clean up input refs for deleted set
+    delete inputRefs.current[`${exerciseId}-${setId}-weight`];
+    delete inputRefs.current[`${exerciseId}-${setId}-reps`];
   };
 
   const updateSetField = (
     exerciseId: number,
-    setIndex: number,
+    setId: number,
     field: 'weight' | 'reps',
     input: string
   ) => {
@@ -150,8 +153,8 @@ export default function CurrentWorkout({
         ex.id === exerciseId
           ? {
               ...ex,
-              sets: ex.sets?.map((s, i) =>
-                i === setIndex
+              sets: ex.sets?.map((s) =>
+                s.id === setId
                   ? { ...s, [field]: value }
                   : s
               ),
@@ -163,26 +166,6 @@ export default function CurrentWorkout({
     // console.log('Updated exercises:', JSON.stringify(exercises, null, 2));
   };
 
-  // handleInputFocus does NOTHING for now. I might use it later if KeyboardAvoidingView proves to be annoying
-  const handleInputFocus = (key: string) => {
-    const input = inputRefs.current[key];
-    const scrollView = scrollViewRef.current;
-
-    if (!input || !scrollView) return;
-
-    input.measure((x, y, width, height, pageX, pageY) => {
-      setCurrHeight(pageY); 
-      console.log(pageY);
-
-      /*if(pageY > 500) {
-        const scrollToY = pageY - 60;
-        scrollView.scrollTo({
-          y: scrollToY,
-          animated: true,
-        });
-      }*/
-    });
-  };
 
   const handleClose = () => {
     closeWorkout();
@@ -247,7 +230,7 @@ export default function CurrentWorkout({
       <ThemedText style={styles.subTitle}>{formatTime(secondsElapsed)}</ThemedText>
       
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: 'transparent' }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={140}
       >
@@ -331,10 +314,10 @@ export default function CurrentWorkout({
               </ThemedView>
               {(exercise.sets || []).map((set, i) => (
                 <SwipeableSet
-                  key={i}
+                  key={set.id}
                   exerciseId={exercise.id}
-                  setIndex={i}
-                  onDelete={() => deleteSet(exercise.id, i)}
+                  setId={set.id}
+                  onDelete={() => deleteSet(exercise.id, set.id)}
                 >
                   <ThemedView
                     style={{
@@ -363,15 +346,14 @@ export default function CurrentWorkout({
                         contextMenuHidden={true}
                         caretHidden={true}
                         showSoftInputOnFocus={true}
+                        returnKeyType="done"
+                        onSubmitEditing={() => inputRefs.current[`${exercise.id}-${set.id}-weight`]?.blur()}
                         onChangeText={(text) =>
-                          updateSetField(exercise.id, i, 'weight', text)
+                          updateSetField(exercise.id, set.id, 'weight', text)
                         }
                         ref={(ref) => {
-                          inputRefs.current[`${exercise.id}-${i}-weight`] = ref;
+                          inputRefs.current[`${exercise.id}-${set.id}-weight`] = ref;
                         }}
-                        onFocus={() =>
-                          handleInputFocus(`${exercise.id}-${i}-weight`)
-                        }
                       ></TextInput>
                     </ThemedView>
 
@@ -385,22 +367,21 @@ export default function CurrentWorkout({
                         contextMenuHidden={true}
                         caretHidden={true}
                         showSoftInputOnFocus={true}
+                        returnKeyType="done"
+                        onSubmitEditing={() => inputRefs.current[`${exercise.id}-${set.id}-reps`]?.blur()}
                         onChangeText={(text) =>
-                          updateSetField(exercise.id, i, 'reps', text)
+                          updateSetField(exercise.id, set.id, 'reps', text)
                         }
                         ref={(ref) => {
-                          inputRefs.current[`${exercise.id}-${i}-reps`] = ref;
+                          inputRefs.current[`${exercise.id}-${set.id}-reps`] = ref;
                         }}
-                        onFocus={() =>
-                          handleInputFocus(`${exercise.id}-${i}-reps`)
-                        }
                       ></TextInput>
                     </ThemedView>
 
                     {/* CHECKMARK */}
                     <ThemedView style={{ width: '10%', alignItems: 'center' }}>
                       <Pressable
-                        onPress={()=>{toggleSetCompleted(exercise.id, i); }}
+                        onPress={()=>{toggleSetCompleted(exercise.id, set.id); }}
                       >
                         <MaterialIcons name="check-circle" size={24} color={set.completed ? 'green' : 'gray'}/>
                       </Pressable>
