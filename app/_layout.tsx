@@ -109,8 +109,24 @@ export default function RootLayout() {
                 </Pressable>
               ),
             }}/>
+            <Stack.Screen name="workouts/editMode" options={{ presentation: 'modal', 
+              title: 'Editing Workout...',
+              /*headerRight: () => (
+                <Pressable onPress={() => console.log('Save pressed')}>
+                  <ThemedText style={[{ color: '#007AFF', fontSize: 17 }, styles.text]}>
+                    Save
+                  </ThemedText>
+                </Pressable>
+              ),
+              headerLeft: () => (
+                <Pressable onPress={() => router.back()}>
+                  <ThemedText style={[{ color: '#FF3B30', fontSize: 17 }, styles.text]}>
+                    Back
+                  </ThemedText>
+                </Pressable>
+              ),*/
+            }}/>
           </Stack>
-
           <WorkoutPanel />
           <StatusBar style="auto" />
         </ThemeProvider>

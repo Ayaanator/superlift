@@ -136,7 +136,7 @@ export default function CurrentWorkout({
           : e
       )
     );
-    // Clean up input refs for deleted set
+
     delete inputRefs.current[`${exerciseId}-${setId}-weight`];
     delete inputRefs.current[`${exerciseId}-${setId}-reps`];
   };
