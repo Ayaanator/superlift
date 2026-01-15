@@ -1,11 +1,24 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { getWorkoutCount } from '@/database/database';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useWorkoutPanel } from './workoutPanelContext';
 
 export default function UserInfo() {
   const background = useThemeColor({}, 'background');
+  const [workoutCount, setWorkoutCount] = useState(0);
+  const { workoutAdded, deletedWorkout } = useWorkoutPanel();
+
+  useEffect(() => {
+    const fetchWorkoutCount = async () => {
+      const count = await getWorkoutCount();
+      setWorkoutCount(count);
+    };
+    fetchWorkoutCount();
+  }, [workoutAdded, deletedWorkout])
 
   return (
     <SafeAreaView style={{ backgroundColor: background }}>
@@ -60,17 +73,17 @@ export default function UserInfo() {
             >
               <ThemedView>
                 <ThemedText>Workouts</ThemedText>
-                <ThemedText>5</ThemedText>
+                <ThemedText>{workoutCount}</ThemedText>
               </ThemedView>
 
               <ThemedView>
                 <ThemedText>Followers</ThemedText>
-                <ThemedText>5</ThemedText>
+                <ThemedText>0</ThemedText>
               </ThemedView>
 
               <ThemedView>
                 <ThemedText>Following</ThemedText>
-                <ThemedText>5</ThemedText>
+                <ThemedText>0</ThemedText>
               </ThemedView>
             </ThemedView>
           </ThemedView>

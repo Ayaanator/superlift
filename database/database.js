@@ -294,3 +294,10 @@ export const deleteWorkout = async (id) => {
 
   await db.runAsync('DELETE FROM workouts WHERE id = ?', [id]);
 };
+
+export const getWorkoutCount = async () => {
+  if (!db) return 0;
+
+  const result = await db.getAllAsync('SELECT COUNT(*) as count FROM workouts;');
+  return result[0].count;
+};
