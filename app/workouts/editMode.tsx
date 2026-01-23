@@ -177,6 +177,7 @@ export default function EditMode() {
   const handleClose = () => {
     setExercises([]);
     router.back();
+    
   };
 
   return (
@@ -203,7 +204,8 @@ export default function EditMode() {
               exercises,
             });
             setExercises([]);
-            router.push('/profile');
+            router.back();
+            router.back();
             setWorkoutAdded(prev => !prev);
           } catch (error) {
             console.error('Failed to save workout:', error);

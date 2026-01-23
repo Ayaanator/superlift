@@ -68,5 +68,12 @@ export const exercises = [
     equipment: "Smith Machine",
     primaryMuscleGroup: "Chest",
     secondaryMuscleGroups: ["Shoulders", "Triceps"]
+  },
+  {
+    id: 10,
+    name: "Swimming (Front Stroke)",
+    equipment: "Water",
+    primaryMuscleGroup: "Full Body",
+    secondaryMuscleGroups: ["Heart", "Lungs"]
   }
 ]
