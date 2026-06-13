@@ -1,5 +1,6 @@
 import CurrentWorkout from '@/app/blocks/currentWorkout';
 import { ThemedView } from '@/components/themed-view';
+import { useSegments } from 'expo-router';
 import React, { useRef } from 'react';
 import { Animated, Dimensions, PanResponder, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,8 +11,10 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default function WorkoutPanel() {
   const { expanded, setExpanded, active } = useWorkoutPanel();
-  const { tabBarHeight, setTabBarHeight } = useTabBarHeight();
+  const { tabBarHeight } = useTabBarHeight();
   const insets = useSafeAreaInsets();
+  const segments = useSegments();
+  const isOnTabScreen = segments[0] === '(tabs)';
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
   const panResponder = useRef(
@@ -30,7 +33,9 @@ export default function WorkoutPanel() {
 
   const REAL_HEIGHT = tabBarHeight;
 
-  if (!active) return null;
+  // Stack modals are separate routes on web (no native layer), so this
+  // overlay would sit on top of them due to zIndex and block the UI.
+  if (!active || !isOnTabScreen) return null;
 
   // const TAB_BAR_HEIGHT = tabBarHeight;
   // const TAB_BAR_HEIGHT = 50;

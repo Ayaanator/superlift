@@ -179,7 +179,7 @@ export default function CurrentWorkout({
         <ThemedText style={styles.previewText}>
           Workout in progress...
         </ThemedText>
-        <ThemedText style={styles.previewSubtext}>Tap to expand</ThemedText>
+        <ThemedText style={styles.previewSubtext}>Drag up to expand</ThemedText>
       </ThemedView>
     );
   }

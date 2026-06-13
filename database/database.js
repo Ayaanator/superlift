@@ -2,14 +2,24 @@
 import { exercises } from "@/constants/exercises";
 import { pastWorkouts } from "@/constants/mockWorkouts";
 import * as SQLite from 'expo-sqlite';
-import { Platform } from 'react-native';
 
-let db = null;
-if (Platform.OS !== 'web') {
-  db = SQLite.openDatabaseSync('simple.db');
-}
+let dbPromise = null;
+
+const getDb = async () => {
+  if (!dbPromise) {
+    await initDB();
+  }
+  return dbPromise;
+};
 
 export const initDB = async () => {
+  if (dbPromise) {
+    return dbPromise;
+  }
+
+  dbPromise = (async () => {
+    const db = await SQLite.openDatabaseAsync('simple.db');
+
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS workouts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,13 +60,18 @@ export const initDB = async () => {
   `);
 
   const workoutsResult = await db.getAllAsync('SELECT COUNT(*) as count FROM workouts;');
-  await insertMasterExercises();
+  await insertMasterExercises(db);
   if (workoutsResult[0].count === 0) {
-    //await insertMockWorkouts();
+    //await insertMockWorkouts(db);
   }
+
+    return db;
+  })();
+
+  return dbPromise;
 };
 
-const insertMockWorkouts = async () => {
+const insertMockWorkouts = async (db) => {
   for (const workout of pastWorkouts) {
     // Insert workout
     await db.runAsync(
@@ -90,6 +105,7 @@ const insertMockWorkouts = async () => {
 };
 
 export const getWorkouts = async () => {
+  const db = await getDb();
   const workouts = await db.getAllAsync('SELECT * FROM workouts ORDER BY date DESC;');
   
   for (const workout of workouts) {
@@ -124,6 +140,7 @@ export const getWorkouts = async () => {
 };
 
 export const getWorkout = async (id) => {
+  const db = await getDb();
   const workoutResult = await db.getAllAsync(
     'SELECT * FROM workouts WHERE id = ?', 
     [id]
@@ -164,6 +181,7 @@ export const getWorkout = async (id) => {
 }
 
 export const clearWorkouts = async () => {
+  const db = await getDb();
   /*await db.execAsync(`DROP TABLE IF EXISTS sets;`);
   await db.execAsync(`DROP TABLE IF EXISTS exercises;`);
   await db.execAsync(`DROP TABLE IF EXISTS workouts;`);*/
@@ -173,7 +191,7 @@ export const clearWorkouts = async () => {
   await db.runAsync('DELETE FROM workouts;');
 };
 
-export const insertMasterExercises = async () => {
+const insertMasterExercises = async (db) => {
   for (const exercise of exercises) {
     await db.runAsync(
       `INSERT OR REPLACE INTO exercise_master (id, name, equipment, primaryMuscleGroup, secondaryMuscleGroups)
@@ -190,13 +208,13 @@ export const insertMasterExercises = async () => {
 };
 
 export const getExercises = async () => {
+  const db = await getDb();
   const workouts = await db.getAllAsync('SELECT * FROM exercise_master');
   return workouts;
 }
 
 export const addWorkout = async ({ name, duration, exercises }) => {
-
-  if (!db) return;
+  const db = await getDb();
   const date = new Date().toISOString();
 
   const workoutResult = await db.runAsync(
@@ -233,7 +251,7 @@ export const addWorkout = async ({ name, duration, exercises }) => {
 };
 
 export const updateWorkout = async (id, { name, duration, exercises }) => {
-  if (!db) return;
+  const db = await getDb();
 
   // Update the workout record
   await db.runAsync(
@@ -279,7 +297,7 @@ export const updateWorkout = async (id, { name, duration, exercises }) => {
 };
 
 export const deleteWorkout = async (id) => {
-  if (!db) return;
+  const db = await getDb();
 
   const exercises = await db.getAllAsync(
     'SELECT id FROM exercises WHERE workout_id = ?',
@@ -296,7 +314,7 @@ export const deleteWorkout = async (id) => {
 };
 
 export const getWorkoutCount = async () => {
-  if (!db) return 0;
+  const db = await getDb();
 
   const result = await db.getAllAsync('SELECT COUNT(*) as count FROM workouts;');
   return result[0].count;
