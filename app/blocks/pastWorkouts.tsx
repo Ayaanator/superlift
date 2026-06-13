@@ -22,7 +22,7 @@ export interface Workout {
   name: string;
   duration: string;
   date: string;
-  totalVolume: number,
+  totalVolume: number;
   exercises: Exercise[];
 }
 
@@ -34,31 +34,43 @@ export const useDeleteWorkoutTest = () => {
 
     console.log('DELETE TESTING:', viewedWorkoutId);
     await deleteWorkout(viewedWorkoutId);
-    setWorkoutAdded(prev => !prev);
+    setWorkoutAdded((prev) => !prev);
   };
 };
 
 export const useEnableEditing = () => {
-  const { viewedWorkoutId, setWorkoutAdded, editWorkout, setEditWorkout } = useWorkoutPanel();
+  const { viewedWorkoutId, setEditWorkout } = useWorkoutPanel();
   const router = useRouter();
-  
+
   return async () => {
     console.log('EDIT TESTING:', viewedWorkoutId);
     setEditWorkout(true);
 
     router.push({
       pathname: `/workouts/editMode`,
-      params: { id: viewedWorkoutId }
+      params: { id: viewedWorkoutId },
     });
   };
 };
 
+const formatWorkoutDate = (dateString: string) => {
+  const parsed = new Date(dateString);
+  if (Number.isNaN(parsed.getTime())) {
+    return dateString;
+  }
+
+  return parsed.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
 export default function PastWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const { workoutAdded, setViewedWorkoutId, viewedWorkoutId } = useWorkoutPanel();
+  const { workoutAdded, setViewedWorkoutId } = useWorkoutPanel();
   const router = useRouter();
 
-  const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
   const textColor = useThemeColor({}, 'text');
 
@@ -66,70 +78,113 @@ export default function PastWorkouts() {
     (async () => {
       // await clearWorkouts();
       // await initDB();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       // await clearWorkouts();
       const data = await getWorkouts();
       setWorkouts(data);
     })();
-      // !!! I AM USING workoutAdded as a check for when workouts are BOTH deleted and added
+    // !!! I AM USING workoutAdded as a check for when workouts are BOTH deleted and added
   }, [workoutAdded]);
 
   const renderWorkoutItem = (item: Workout) => (
-    <Pressable key={item.id} onPress={() => {
-      router.push({
-        pathname: `/workouts/details`,
-        params: { id: item.id, name: item.name },
-      });
-      setViewedWorkoutId(Number(item.id));
-    }}>
-      
-    <ThemedView style={[styles.workoutItem, { backgroundColor: secondaryColor }]}>
-      <ThemedText style={[styles.workoutName, { color: textColor }]}>
-        {item.name}
-      </ThemedText>
-      <ThemedText style={[styles.workoutDetails, { color: textColor, paddingBottom: 8 }]}>
-        {item.duration} seconds • {item.date}
-      </ThemedText>
-      <ThemedView style={{ flexDirection: 'column', gap: 20, borderRadius: 6,
-         paddingLeft: 10, paddingTop: 4, paddingBottom: 12, overflow: 'hidden' }}>
-        <ThemedView style={{ display: 'flex', gap: 5, overflow: 'hidden', flexDirection: 'row' }}>
-          {/* Volume */}
-          <ThemedView style={[{ alignItems: 'center' }, { margin: 0 }, { padding: 0 }]}>
-            <ThemedText style={{ fontSize: 12, color: textColor }}>Volume</ThemedText>
-            <ThemedText style={{ fontSize: 18, fontWeight: '700', color: textColor }}>
-              {item.totalVolume || 0}
-            </ThemedText>
+    <Pressable
+      key={item.id}
+      onPress={() => {
+        router.push({
+          pathname: `/workouts/details`,
+          params: { id: item.id, name: item.name },
+        });
+        setViewedWorkoutId(Number(item.id));
+      }}
+    >
+      <ThemedView
+        style={[styles.workoutItem, { backgroundColor: secondaryColor }]}
+      >
+        <ThemedText style={[styles.workoutName, { color: textColor }]}>
+          {item.name}
+        </ThemedText>
+        <ThemedText
+          style={[
+            styles.workoutDetails,
+            { color: textColor, paddingBottom: 8 },
+          ]}
+        >
+          {item.duration} seconds • {formatWorkoutDate(item.date)}
+        </ThemedText>
+        <ThemedView
+          style={{
+            flexDirection: 'column',
+            gap: 20,
+            borderRadius: 6,
+            paddingLeft: 10,
+            paddingTop: 4,
+            paddingBottom: 12,
+            overflow: 'hidden',
+          }}
+        >
+          <ThemedView
+            style={{
+              display: 'flex',
+              gap: 5,
+              overflow: 'hidden',
+              flexDirection: 'row',
+            }}
+          >
+            {/* Volume */}
+            <ThemedView
+              style={[{ alignItems: 'center' }, { margin: 0 }, { padding: 0 }]}
+            >
+              <ThemedText style={{ fontSize: 12, color: textColor }}>
+                Volume
+              </ThemedText>
+              <ThemedText
+                style={{ fontSize: 18, fontWeight: '700', color: textColor }}
+              >
+                {item.totalVolume || 0}
+              </ThemedText>
+            </ThemedView>
+
+            {/* Exercises */}
+            <ThemedView style={{ alignItems: 'center' }}>
+              <ThemedText style={{ fontSize: 12, color: textColor }}>
+                Exercises
+              </ThemedText>
+              <ThemedText
+                style={{ fontSize: 18, fontWeight: '700', color: textColor }}
+              >
+                {item.exercises?.length || 0}
+              </ThemedText>
+            </ThemedView>
           </ThemedView>
 
-          {/* Exercises */}
-          <ThemedView style={{ alignItems: 'center' }}>
-            <ThemedText style={{ fontSize: 12, color: textColor }}>Exercises</ThemedText>
-            <ThemedText style={{ fontSize: 18, fontWeight: '700', color: textColor }}>
-              {item.exercises?.length || 0}
-            </ThemedText>
+          {/*Exercise list*/}
+          <ThemedView style={{ display: 'flex', gap: 5, overflow: 'hidden' }}>
+            {item.exercises.slice(0, 4).map((exercise, index) => (
+              <ThemedText
+                key={index}
+                style={{ fontSize: 18, color: textColor, marginBottom: 8 }}
+              >
+                {exercise.name}
+              </ThemedText>
+            ))}
+
+            {item.exercises?.length > 4 && (
+              <ThemedText
+                style={{
+                  fontSize: 12,
+                  color: textColor,
+                  opacity: 0.7,
+                  marginTop: 8,
+                }}
+              >
+                See {item.exercises.length - 4} more exercise
+                {item.exercises.length - 4 === 1 ? '' : 's'}
+              </ThemedText>
+            )}
           </ThemedView>
-        </ThemedView>
-
-        {/*Exercise list*/}
-        <ThemedView style={{ display: 'flex', gap: 5, overflow: 'hidden' }}>
-          {item.exercises.slice(0, 4).map((exercise, index) => (
-            <ThemedText key={index} style={{ fontSize: 18, color: textColor, 
-            marginBottom: 8 }}>
-              {exercise.name}
-            </ThemedText>
-          ))}
-
-          {item.exercises?.length > 4 && (
-            <ThemedText style={{ fontSize: 12, color: textColor, opacity: 0.7, marginTop: 8 }}>
-              See {item.exercises.length - 4} more exercise{item.exercises.length - 4 === 1? '' : 's'}
-            </ThemedText>
-          )}
         </ThemedView>
       </ThemedView>
-    </ThemedView>
-
     </Pressable>
-
   );
 
   if (workouts.length === 0) {

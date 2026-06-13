@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import type { Exercise } from '../exercises';
 
 type WorkoutPanelContextType = {
@@ -9,6 +9,8 @@ type WorkoutPanelContextType = {
   closeWorkout: () => void;
   exercises: Exercise[];
   setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+  secondsElapsed: number;
+  setSecondsElapsed: React.Dispatch<React.SetStateAction<number>>;
   workoutAdded: boolean;
   setWorkoutAdded: React.Dispatch<React.SetStateAction<boolean>>;
   deletedWorkout: boolean;
@@ -27,6 +29,7 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   const [active, setActive] = useState(false);
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [workoutAdded, setWorkoutAdded] = useState(false);
   const [deletedWorkout, setDeletedWorkout] = useState(false);
   const [editWorkout, setEditWorkout] = useState(false);
@@ -36,7 +39,20 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
   const closeWorkout = () => {
     setActive(false);
     setExpanded(false);
+    setSecondsElapsed(0);
   };
+
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setSecondsElapsed((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [active]);
 
   return (
     <WorkoutPanelContext.Provider value={{ 
@@ -47,6 +63,8 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
       closeWorkout,
       exercises,
       setExercises,
+      secondsElapsed,
+      setSecondsElapsed,
       workoutAdded,
       setWorkoutAdded,
       deletedWorkout,

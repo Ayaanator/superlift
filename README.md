@@ -1,8 +1,49 @@
-# Welcome to your Expo app 👋
+# SuperLift
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+SuperLift is a cross-platform workout tracking app built with Expo and React Native. It is designed to run on iOS, Android, and web while persisting workout history locally for offline use.
 
-## Get started
+## Project overview
+
+This app provides a local-first training log for recording workouts, viewing past sessions, and editing saved routines. It uses `expo-router` for multi-screen navigation, `expo-sqlite` for device-level persistence, and React Native gesture APIs for interactive workout UI.
+
+## Key features
+
+- Log workouts with a name, duration, exercises, and sets
+- View past workout sessions with history and session details
+- Edit and delete saved workouts using full CRUD flows
+- Use an offline-first SQLite data model for `workouts`, `exercises`, and `sets`
+- Gesture-driven UI interactions with `react-native` `Animated` and `PanResponder`
+- Cross-platform support for Expo web, Android, and iOS
+
+## Resume-aligned highlights
+
+- In development: built a cross-platform workout tracking app using Expo/React Native for logging workouts and viewing session history
+- Designed a local-first SQLite data model for workouts, exercises, and sets to support full offline functionality
+- Implemented core CRUD flows for workouts across multi-screen navigation, including create, edit, and delete operations
+- Built gesture-based UI interactions (swipe-to-delete, expandable workout views) using React Native Animated/PanResponder
+
+## Tech stack
+
+- Expo / React Native
+- Expo Router
+- React Navigation
+- Expo SQLite (`expo-sqlite`)
+- React Native Animated / PanResponder
+- TypeScript
+- Web support via Expo Web
+
+## Database model
+
+The app stores workout data locally using SQLite tables for:
+
+- `workouts`
+- `exercises`
+- `sets`
+- `exercise_master`
+
+This local-first architecture enables offline persistence and a smooth mobile experience without any remote backend.
+
+## Getting started
 
 1. Install dependencies
 
@@ -16,35 +57,12 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Open the app on your desired platform:
+   - Android emulator
+   - iOS simulator
+   - web browser
+   - Expo Go
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Notes
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+The current implementation focuses on client-side workout tracking and local persistence. The app is structured for further enhancements such as exercise search, analytics, and cloud sync.

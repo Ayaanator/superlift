@@ -4,6 +4,7 @@ import { initDB } from '@/database/database';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
+
 import {
   DarkTheme,
   DefaultTheme,
@@ -33,6 +34,9 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
 
+  const outerBackgroundColor = colorScheme === 'dark' ? '#35393b' : '#f3ebe1';
+  const innerBackgroundColor = colorScheme === 'dark' ? '#151718' : '#ffffff';
+
   useEffect(() => {
     initDB();
   }, []);
@@ -43,9 +47,7 @@ export default function RootLayout() {
     const router = useRouter();
     const [showMenu, setShowMenu] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const backgroundColor = useThemeColor({}, 'background');
     const secondaryColor = useThemeColor({}, 'secondary');
-    const textColor = useThemeColor({}, 'text');
 
     const handleDelete = () => {
       deleteWorkout();
@@ -226,8 +228,20 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
-          <View style={styles.appWrapper}>
-            <View style={styles.webWidthWrapper}>
+          <View
+            style={[
+              styles.appWrapper,
+              styles.noSelect,
+              { backgroundColor: outerBackgroundColor },
+            ]}
+          >
+            <View
+              style={[
+                styles.webWidthWrapper,
+                styles.noSelect,
+                { backgroundColor: innerBackgroundColor },
+              ]}
+            >
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
@@ -296,7 +310,7 @@ export default function RootLayout() {
                           style={[
                             styles.headerButtonText,
                             styles.headerButtonTextSecondary,
-                            styles.buttonBackground
+                            styles.buttonBackground,
                           ]}
                         >
                           Back
@@ -425,6 +439,12 @@ const styles = StyleSheet.create({
     maxWidth: Platform.OS === 'web' ? 480 : '100%',
     minHeight: '100%',
   },
+  noSelect: {
+    userSelect: 'none',
+    //WebkitUserSelect: 'none',
+    //MozUserSelect: 'none',
+    //WebkitTouchCallout: 'none',
+  },
   deleteConfirmOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -488,5 +508,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#1f2122',
     padding: 6,
     borderRadius: 5,
-  }
+  },
 });

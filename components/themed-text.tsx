@@ -19,6 +19,7 @@ export function ThemedText({
 
   return (
     <Text
+      selectable={false}
       style={[
         { color },
         type === 'default' ? styles.default : undefined,
@@ -26,6 +27,7 @@ export function ThemedText({
         type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
         type === 'subtitle' ? styles.subtitle : undefined,
         type === 'link' ? styles.link : undefined,
+        styles.noSelect,
         style,
       ]}
       {...rest}
@@ -56,5 +58,10 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     fontSize: 16,
     color: '#0a7ea4',
+  },
+  noSelect: {
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
   },
 });

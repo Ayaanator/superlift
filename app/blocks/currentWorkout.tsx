@@ -71,9 +71,8 @@ export default function CurrentWorkout({
   preview = false,
   fullScreen = false,
   }: Props) {
-  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded, setReplacingExerciseId } = useWorkoutPanel();
+  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded, setReplacingExerciseId, secondsElapsed, setSecondsElapsed } = useWorkoutPanel();
   const [workoutName, setWorkoutName] = useState("");
-  const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [currHeight, setCurrHeight] = useState(-1);
 
   const insets = useSafeAreaInsets();
@@ -86,13 +85,6 @@ export default function CurrentWorkout({
   const inputRefs = useRef<Record<string, TextInput | null>>({});
   const scrollOffset = useRef(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSecondsElapsed(prev => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -168,6 +160,7 @@ export default function CurrentWorkout({
 
 
   const handleClose = () => {
+    setSecondsElapsed(0);
     closeWorkout();
     setExercises([]);
     setExpanded(false);
@@ -218,14 +211,10 @@ export default function CurrentWorkout({
       <TextInput
         style={[styles.nameInput, {color: textColor}]}
         value={String(workoutName)}
-        /*selectTextOnFocus={true}
-        contextMenuHidden={true}
-        caretHidden={true}
-        showSoftInputOnFocus={true}*/
         onChangeText={(text) =>
           setWorkoutName(text)
         }
-      ></TextInput>
+      />
 
       <ThemedText style={styles.subTitle}>{formatTime(secondsElapsed)}</ThemedText>
       
