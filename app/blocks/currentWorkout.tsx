@@ -73,6 +73,7 @@ export default function CurrentWorkout({
   }: Props) {
   const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded, setReplacingExerciseId, secondsElapsed, setSecondsElapsed, workoutName, setWorkoutName } = useWorkoutPanel();
   const [currHeight, setCurrHeight] = useState(-1);
+  //setWorkoutName("");
 
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -159,6 +160,7 @@ export default function CurrentWorkout({
 
 
   const handleClose = () => {
+    setWorkoutName("");
     setSecondsElapsed(0);
     closeWorkout();
     setExercises([]);

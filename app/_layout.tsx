@@ -10,6 +10,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from '@react-navigation/native';
+import { Analytics } from '@vercel/analytics/next';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
@@ -345,6 +346,7 @@ export default function RootLayout() {
             </View>
           </View>
           <StatusBar style="auto" />
+          <Analytics />
         </ThemeProvider>
       </TabBarHeightProvider>
     </WorkoutPanelProvider>
