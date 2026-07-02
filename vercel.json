@@ -1,8 +1,12 @@
 {
-  "rewrites": [
+  "buildCommand": "npx expo export -p web",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "redirects": [
     {
-      "source": "/(.*)",
-      "destination": "/"
+      "source": "/",
+      "destination": "/workout",
+      "type": 308
     }
   ]
 }
