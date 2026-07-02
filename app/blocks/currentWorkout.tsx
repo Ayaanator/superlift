@@ -71,7 +71,8 @@ export default function CurrentWorkout({
   preview = false,
   fullScreen = false,
   }: Props) {
-  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded, setReplacingExerciseId, secondsElapsed, setSecondsElapsed, workoutName, setWorkoutName } = useWorkoutPanel();
+  const { closeWorkout, setExpanded, setExercises, exercises, workoutAdded, setWorkoutAdded, setReplacingExerciseId, secondsElapsed, setSecondsElapsed } = useWorkoutPanel();
+  const [workoutName, setWorkoutName] = useState("");
   const [currHeight, setCurrHeight] = useState(-1);
 
   const insets = useSafeAreaInsets();

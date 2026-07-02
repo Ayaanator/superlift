@@ -21,8 +21,6 @@ type WorkoutPanelContextType = {
   setEditWorkout: React.Dispatch<React.SetStateAction<boolean>>;
   replacingExerciseId: number | null;
   setReplacingExerciseId: (id: number | null) => void;
-  workoutName: string;
-  setWorkoutName: (n: string) => void;
 };
 
 const WorkoutPanelContext = createContext<WorkoutPanelContextType | null>(null);
@@ -37,7 +35,6 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
   const [editWorkout, setEditWorkout] = useState(false);
   const [viewedWorkoutId, setViewedWorkoutId] = useState(-1);
   const [replacingExerciseId, setReplacingExerciseId] = useState<number | null>(null);
-  const [workoutName, setWorkoutName] = useState("");
 
   const closeWorkout = () => {
     setActive(false);
@@ -78,8 +75,6 @@ export function WorkoutPanelProvider({ children }: { children: ReactNode }) {
       setEditWorkout,
       replacingExerciseId,
       setReplacingExerciseId,
-      workoutName,
-      setWorkoutName,
     }}>
       {children}
     </WorkoutPanelContext.Provider>
