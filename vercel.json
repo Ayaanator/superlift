@@ -4,8 +4,12 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/workout.html"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/$1"
+      "destination": "/$1.html"
     }
   ]
 }
