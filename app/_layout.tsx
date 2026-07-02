@@ -10,7 +10,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from '@react-navigation/native';
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
