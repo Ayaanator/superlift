@@ -2,7 +2,7 @@
 
 SuperLift is a cross-platform workout tracking app built with Expo and React Native. It is designed to run on iOS, Android, and web while persisting workout history locally for offline use.
 
-Website link: https://superlift-8e74wziie-ayaanators-projects.vercel.app/
+Website link: https://superlift-three.vercel.app/
 
 ## Project overview
 
